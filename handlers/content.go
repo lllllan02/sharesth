@@ -15,15 +15,15 @@ func MyContentPageHandler(c *gin.Context) {
 
 // MyContentAPIHandler 返回当前用户内容的JSON数据
 func MyContentAPIHandler(c *gin.Context) {
-	// 获取客户端IP
-	clientIP := utils.GetClientIP(c.Request)
+	// 获取客户端标识
+	clientIdentifier := utils.GetClientIdentifier(c.Request)
 
-	// 查询所有来自该IP的内容
-	results := utils.FindContentsBySource(clientIP)
+	// 查询所有来自该客户端的内容
+	results := utils.FindContentsBySource(clientIdentifier)
 
 	// 返回JSON结果
 	c.JSON(http.StatusOK, gin.H{
-		"source": clientIP,
+		"source": clientIdentifier,
 		"count":  len(results),
 		"items":  results,
 	})

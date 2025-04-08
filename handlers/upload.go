@@ -17,8 +17,8 @@ import (
 
 // UploadHandler 处理上传内容
 func UploadHandler(c *gin.Context) {
-	// 获取客户端IP地址
-	clientIP := utils.GetClientIP(c.Request)
+	// 获取客户端标识
+	clientIdentifier := utils.GetClientIdentifier(c.Request)
 
 	// 获取标题（如果没有提供，则使用默认标题）
 	title := c.PostForm("title")
@@ -40,7 +40,7 @@ func UploadHandler(c *gin.Context) {
 		content := models.Content{
 			Type:       "text",
 			Data:       textContent,
-			Source:     clientIP,
+			Source:     clientIdentifier,
 			CreateTime: time.Now(),
 			Title:      title,
 		}
@@ -94,7 +94,7 @@ func UploadHandler(c *gin.Context) {
 		content := models.Content{
 			Type:       "image",
 			Data:       filename,
-			Source:     clientIP,
+			Source:     clientIdentifier,
 			CreateTime: time.Now(),
 			Title:      title,
 		}
