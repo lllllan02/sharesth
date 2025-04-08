@@ -926,4 +926,44 @@ button:hover, .button:hover, .search-button:hover {
     background-color: #D01528;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(208, 21, 40, 0.4);
+}
+
+/* 图片预览页面样式 */
+.image-view-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.image-title {
+    font-size: 24px;
+    color: #1976D2;
+    margin-bottom: 20px;
+    text-align: center;
+    word-break: break-word;
+}
+
+.image-display {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.image-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.download-button {
+    background-color: #4CAF50;
+}
+
+.download-button:hover {
+    background-color: #388E3C;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(56, 142, 60, 0.4);
 } 

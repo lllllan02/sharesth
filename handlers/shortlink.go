@@ -29,8 +29,11 @@ func ShortLinkHandler(c *gin.Context) {
 	// 根据内容类型来显示不同的内容
 	switch content.Type {
 	case "image":
-		// 对于图片类型，直接重定向到图片
-		c.File(content.Data)
+		// 使用图片预览模板
+		c.HTML(http.StatusOK, "image.html", gin.H{
+			"Title":     content.Title,
+			"ImagePath": "/" + content.Data,
+		})
 	case "text":
 		// 对于文本内容，使用文本模板
 		c.HTML(http.StatusOK, "text.html", gin.H{
