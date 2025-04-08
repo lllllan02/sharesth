@@ -1,0 +1,442 @@
+/* 通用样式 */
+body {
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f5f8fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(33, 150, 243, 0.1);
+}
+
+h1 {
+    color: #1976D2;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+a {
+    color: #2196F3;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: #1565C0;
+}
+
+/* 表单元素 */
+input[type="text"], .title-input, .search-input, .filter-input {
+    padding: 10px 15px;
+    border: 1px solid #BBDEFB;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input[type="text"]:focus, .title-input:focus, .search-input:focus, .filter-input:focus, textarea:focus {
+    outline: none;
+    border-color: #2196F3;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+}
+
+.search-form input[type="text"] {
+    width: 70%;
+}
+
+.title-input {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.search-input, .filter-input {
+    flex-grow: 1;
+}
+
+.input-label {
+    display: block;
+    margin-bottom: 5px;
+    color: #1976D2;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+textarea {
+    width: 100%;
+    height: 200px;
+    padding: 15px;
+    border: 1px solid #BBDEFB;
+    border-radius: 6px;
+    font-size: 16px;
+    resize: vertical;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* 按钮样式 */
+button, .button, .search-button {
+    padding: 10px 20px;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 5px rgba(33, 150, 243, 0.3);
+}
+
+button:hover, .button:hover, .search-button:hover {
+    background-color: #1976D2;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(33, 150, 243, 0.4);
+}
+
+.search-form button {
+    background-color: #2196F3;
+}
+
+.search-form button:hover {
+    background-color: #1976D2;
+}
+
+/* 页面布局组件 */
+.tabs {
+    display: flex;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #BBDEFB;
+}
+
+.tab {
+    padding: 12px 24px;
+    cursor: pointer;
+    border-radius: 5px 5px 0 0;
+    background-color: #E3F2FD;
+    margin-right: 5px;
+    color: #1976D2;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.tab:hover {
+    background-color: #BBDEFB;
+}
+
+.tab.active {
+    background-color: #2196F3;
+    color: white;
+}
+
+.content {
+    display: none;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 5px 0;
+}
+
+.content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.footer {
+    margin-top: 30px;
+    text-align: center;
+    padding: 15px;
+    border-top: 1px solid #BBDEFB;
+}
+
+.footer a {
+    color: #1976D2;
+    margin: 0 10px;
+}
+
+.footer a:hover {
+    color: #1565C0;
+}
+
+.back-link {
+    display: block;
+    text-align: center;
+    margin-top: 25px;
+}
+
+.back-link a {
+    color: #1976D2;
+    padding: 8px 16px;
+    border: 1px solid #BBDEFB;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.back-link a:hover {
+    background-color: #E3F2FD;
+    color: #1565C0;
+    text-decoration: none;
+}
+
+/* 图片上传组件 */
+.file-input-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.file-input-wrapper input[type=file] {
+    font-size: 100px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.file-input-button {
+    background-color: #E3F2FD;
+    color: #1976D2;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-block;
+    transition: all 0.3s ease;
+    border: 1px solid #BBDEFB;
+}
+
+.file-input-button:hover {
+    background-color: #BBDEFB;
+}
+
+#preview-container {
+    margin-top: 15px;
+    background-color: #E3F2FD;
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #BBDEFB;
+}
+
+#preview-image {
+    max-width: 100%;
+    max-height: 300px;
+    display: none;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.2);
+}
+
+/* 结果展示 */
+.result {
+    margin-top: 25px;
+    padding: 15px;
+    background-color: #E3F2FD;
+    border-radius: 6px;
+    display: none;
+    border-left: 4px solid #2196F3;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.shortlink {
+    font-weight: bold;
+    word-break: break-all;
+    color: #1976D2;
+    max-width: 100%;
+    overflow-wrap: break-word;
+}
+
+.copy-button {
+    margin-left: 10px;
+}
+
+/* 内容显示框 */
+.content-box {
+    background-color: #E3F2FD;
+    border: 1px solid #BBDEFB;
+    border-radius: 6px;
+    padding: 20px;
+    margin: 20px 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    box-shadow: 0 1px 3px rgba(33, 150, 243, 0.1);
+    width: 100%;
+    box-sizing: border-box;
+    font-family: monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+}
+
+/* 内容列表项 */
+.content-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.content-item {
+    position: relative;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: #fff;
+    border: 1px solid #BBDEFB;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(33, 150, 243, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.content-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(33, 150, 243, 0.2);
+}
+
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.content-type {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.type-text {
+    background-color: #E3F2FD;
+    color: #1976D2;
+}
+
+.type-image {
+    background-color: #E3F2FD;
+    color: #1976D2;
+}
+
+.content-time {
+    font-size: 14px;
+    color: #757575;
+}
+
+.content-title {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 10px 0;
+    color: #1976D2;
+}
+
+.content-id {
+    font-size: 12px;
+    color: #9e9e9e;
+    margin-top: 5px;
+}
+
+.content-link {
+    margin-top: 12px;
+    text-align: right;
+}
+
+.content-link a {
+    display: inline-block;
+    padding: 6px 14px;
+    color: #2196F3;
+    text-decoration: none;
+    border: 1px solid #2196F3;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.content-link a:hover {
+    background-color: #2196F3;
+    color: white;
+    text-decoration: none;
+}
+
+/* 搜索与过滤 */
+.search-form {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.search-box, .filter-box {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.filter-box {
+    margin-top: 15px;
+}
+
+.filter-label {
+    margin-right: 10px;
+    color: #1976D2;
+    font-weight: 500;
+}
+
+/* 用户信息 */
+.user-info {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #E3F2FD;
+    border-radius: 4px;
+    border-left: 4px solid #2196F3;
+}
+
+.results {
+    display: none;
+    margin-top: 20px;
+}
+
+.no-content, .no-results, .no-search-result {
+    text-align: center;
+    padding: 30px;
+    color: #757575;
+    background-color: #E3F2FD;
+    border-radius: 8px;
+    margin: 20px 0;
+    border: 1px solid #BBDEFB;
+}
+
+/* 加载状态 */
+.loading {
+    text-align: center;
+    padding: 20px;
+    color: #1976D2;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    margin: 10px auto;
+    border: 4px solid rgba(33, 150, 243, 0.1);
+    border-radius: 50%;
+    border-left-color: #2196F3;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 辅助类 */
+.hidden {
+    display: none !important;
+} 
