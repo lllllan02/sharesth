@@ -190,8 +190,14 @@
                     method: 'POST',
                     body: formData
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('服务器响应错误: ' + response.status);
+                    }
+                    return response.json();
+                })
                 .then(result => {
+                    console.log('图片上传响应:', result); // 添加调试信息
                     if (result.success && result.file && result.file.url) {
                         onSuccess(result.file.url);
                     } else {
@@ -434,12 +440,18 @@
         
         // 统一的上传处理函数
         function uploadContent(formData, button, originalHTML) {
-            fetch('/upload', {
+            fetch('/share', {
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('服务器响应错误: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('服务器响应:', data); // 添加调试信息
                 if (data.error) {
                     throw new Error(data.error);
                 }

@@ -32,7 +32,7 @@ func main() {
 
 	// 路由配置
 	r.GET("/", handlers.IndexHandler)
-	r.POST("/upload", handlers.UploadHandler)
+	r.POST("/share", handlers.ShareHandler)
 	r.POST("/upload/image", handlers.UploadImageForMD) // Markdown编辑器的图片上传
 	r.GET("/my-content", handlers.MyContentPageHandler)
 	r.GET("/api/my-content", handlers.MyContentAPIHandler)
