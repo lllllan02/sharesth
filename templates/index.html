@@ -22,7 +22,10 @@
             <input type="text" id="text-title" class="title-input" placeholder="为您的分享添加一个标题">
             <label class="input-label">内容</label>
             <textarea id="text-input" placeholder="在这里粘贴您要分享的文本..."></textarea>
-            <button class="button" id="share-text">分享文本</button>
+            <div class="button-group">
+                <button class="button" id="share-text">分享文本</button>
+                <button class="button reset-button" id="reset-text" style="display:none;">继续分享</button>
+            </div>
         </div>
         
         <div class="content" id="image-content">
@@ -35,7 +38,10 @@
             <div id="preview-container">
                 <img id="preview-image" src="" alt="预览图片">
             </div>
-            <button class="button" id="share-image">分享图片</button>
+            <div class="button-group">
+                <button class="button" id="share-image">分享图片</button>
+                <button class="button reset-button" id="reset-image" style="display:none;">继续分享</button>
+            </div>
         </div>
         
         <div class="result" id="result">
@@ -98,13 +104,74 @@
             }).showToast();
         }
         
+        // 防抖函数
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                const context = this;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), wait);
+            };
+        }
+        
+        // 禁用按钮函数
+        function disableButton(button, text) {
+            button.disabled = true;
+            button.style.backgroundColor = '#BBDEFB';
+            button.style.cursor = 'not-allowed';
+            button.textContent = text || '处理中...';
+        }
+        
+        // 重置按钮状态
+        function resetButton(button, originalText) {
+            button.disabled = false;
+            button.style.backgroundColor = '#2196F3';
+            button.style.cursor = 'pointer';
+            button.textContent = originalText;
+        }
+        
+        // 重置文本表单
+        function resetTextForm() {
+            document.getElementById('text-title').value = '';
+            document.getElementById('text-input').value = '';
+            document.getElementById('share-text').style.display = 'block';
+            document.getElementById('reset-text').style.display = 'none';
+            document.getElementById('result').style.display = 'none';
+        }
+        
+        // 重置图片表单
+        function resetImageForm() {
+            document.getElementById('image-title').value = '';
+            document.getElementById('image-input').value = '';
+            document.getElementById('preview-image').style.display = 'none';
+            document.getElementById('preview-image').src = '';
+            document.getElementById('share-image').style.display = 'block';
+            document.getElementById('reset-image').style.display = 'none';
+            document.getElementById('result').style.display = 'none';
+        }
+        
+        // 继续分享文本按钮事件
+        document.getElementById('reset-text').addEventListener('click', function() {
+            resetTextForm();
+        });
+        
+        // 继续分享图片按钮事件
+        document.getElementById('reset-image').addEventListener('click', function() {
+            resetImageForm();
+        });
+        
         // 分享文本
-        document.getElementById('share-text').addEventListener('click', function() {
+        document.getElementById('share-text').addEventListener('click', debounce(function() {
+            const button = this;
+            const originalText = button.textContent;
+            
             const text = document.getElementById('text-input').value.trim();
             if (!text) {
                 showToast('请输入要分享的文本');
                 return;
             }
+            
+            disableButton(button, '分享中...');
             
             const title = document.getElementById('text-title').value.trim();
             
@@ -122,20 +189,35 @@
             .then(data => {
                 document.getElementById('shortlink').textContent = data.shortLink;
                 document.getElementById('result').style.display = 'block';
+                // 隐藏分享按钮，显示继续分享按钮
+                button.style.display = 'none';
+                document.getElementById('reset-text').style.display = 'block';
+                
+                // 禁用文本输入区域
+                document.getElementById('text-title').setAttribute('readonly', 'readonly');
+                document.getElementById('text-input').setAttribute('readonly', 'readonly');
+                document.getElementById('text-title').style.opacity = '0.7';
+                document.getElementById('text-input').style.opacity = '0.7';
             })
             .catch(error => {
                 console.error('Error:', error);
                 showToast('发生错误，请稍后重试');
+                resetButton(button, originalText);
             });
-        });
+        }, 500));
         
         // 分享图片
-        document.getElementById('share-image').addEventListener('click', function() {
+        document.getElementById('share-image').addEventListener('click', debounce(function() {
+            const button = this;
+            const originalText = button.textContent;
+            
             const fileInput = document.getElementById('image-input');
             if (fileInput.files.length === 0) {
                 showToast('请选择要分享的图片');
                 return;
             }
+            
+            disableButton(button, '分享中...');
             
             const title = document.getElementById('image-title').value.trim();
             
@@ -153,12 +235,23 @@
             .then(data => {
                 document.getElementById('shortlink').textContent = data.shortLink;
                 document.getElementById('result').style.display = 'block';
+                // 隐藏分享按钮，显示继续分享按钮
+                button.style.display = 'none';
+                document.getElementById('reset-image').style.display = 'block';
+                
+                // 禁用图片输入区域
+                document.getElementById('image-title').setAttribute('readonly', 'readonly');
+                document.getElementById('image-input').disabled = true;
+                document.getElementById('image-title').style.opacity = '0.7';
+                document.querySelector('.file-input-button').style.opacity = '0.7';
+                document.querySelector('.file-input-button').style.pointerEvents = 'none';
             })
             .catch(error => {
                 console.error('Error:', error);
                 showToast('发生错误，请稍后重试');
+                resetButton(button, originalText);
             });
-        });
+        }, 500));
         
         // 复制链接
         document.getElementById('copy-button').addEventListener('click', function() {
