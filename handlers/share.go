@@ -14,9 +14,12 @@ import (
 )
 
 // handleTextContent 处理文本和Markdown内容
-func handleTextContent(c *gin.Context, contentType, clientIdentifier, title string) (models.Content, error) {
-	// 获取内容 
+func handleTextContent(c *gin.Context, contentType, clientIdentifier, title string, isPublic bool) (models.Content, error) {
+	// 获取内容 (适配旧版本，同时接受 'markdown' 和 'content' 参数)
 	contentData := c.PostForm("content")
+	if contentData == "" {
+		contentData = c.PostForm("markdown") // 兼容旧版本
+	}
 
 	if contentData == "" {
 		return models.Content{}, fmt.Errorf("未提供内容")
@@ -39,13 +42,14 @@ func handleTextContent(c *gin.Context, contentType, clientIdentifier, title stri
 		Source:     clientIdentifier,
 		CreateTime: time.Now(),
 		Title:      title,
+		IsPublic:   isPublic,
 	}
 
 	return content, nil
 }
 
 // handleImageContent 处理图片内容
-func handleImageContent(c *gin.Context, clientIdentifier, title string) (models.Content, error) {
+func handleImageContent(c *gin.Context, clientIdentifier, title string, isPublic bool) (models.Content, error) {
 	// 获取上传的图片文件
 	file, err := c.FormFile("file")
 	if err != nil {
@@ -81,6 +85,7 @@ func handleImageContent(c *gin.Context, clientIdentifier, title string) (models.
 		Source:     clientIdentifier,
 		CreateTime: time.Now(),
 		Title:      title,
+		IsPublic:   isPublic,
 	}
 
 	return content, nil
@@ -111,6 +116,10 @@ func ShareHandler(c *gin.Context) {
 	title := c.PostForm("title")
 	log.Printf("分享标题: %s", title)
 
+	// 获取公开设置参数
+	isPublic := c.PostForm("is_public") == "true"
+	log.Printf("内容公开设置: %v", isPublic)
+
 	var (
 		content models.Content
 		err     error
@@ -119,9 +128,9 @@ func ShareHandler(c *gin.Context) {
 	// 根据内容类型处理不同的上传
 	switch contentType {
 	case "markdown", "text":
-		content, err = handleTextContent(c, contentType, clientIdentifier, title)
+		content, err = handleTextContent(c, contentType, clientIdentifier, title, isPublic)
 	case "image":
-		content, err = handleImageContent(c, clientIdentifier, title)
+		content, err = handleImageContent(c, clientIdentifier, title, isPublic)
 	}
 
 	if err != nil {

@@ -203,29 +203,38 @@
                     header.appendChild(typeSpan);
                     header.appendChild(timeSpan);
                     
-                    // 添加标题
-                    const titleDiv = document.createElement('div');
-                    titleDiv.className = 'content-title';
-                    titleDiv.textContent = item.title || '无标题';
+                    const title = document.createElement('h3');
+                    title.className = 'content-title';
+                    title.textContent = item.title || '无标题';
                     
-                    const idDiv = document.createElement('div');
-                    idDiv.className = 'content-id';
-                    idDiv.innerHTML = '<i class="fas fa-link"></i> 短链接ID: ' + item.id;
+                    const actions = document.createElement('div');
+                    actions.className = 'content-actions';
                     
+                    // 添加查看链接
                     const linkDiv = document.createElement('div');
                     linkDiv.className = 'content-link';
+                    linkDiv.innerHTML = `<a href="${item.link}" target="_blank"><i class="fas fa-external-link-alt"></i> 查看内容</a>`;
                     
-                    const link = document.createElement('a');
-                    link.href = item.link;
-                    link.innerHTML = '<i class="fas fa-external-link-alt"></i> 查看内容';
-                    link.target = '_blank';
+                    // 添加公开/隐藏切换按钮
+                    const visibilityBtn = document.createElement('button');
+                    visibilityBtn.className = 'visibility-toggle ' + (item.is_public ? 'public' : 'private');
+                    visibilityBtn.innerHTML = item.is_public ? 
+                        '<i class="fas fa-eye"></i> 公开' : 
+                        '<i class="fas fa-eye-slash"></i> 隐藏';
+                    visibilityBtn.dataset.id = item.short_id;
+                    visibilityBtn.dataset.public = item.is_public;
                     
-                    linkDiv.appendChild(link);
+                    // 添加切换公开/隐藏状态的事件监听
+                    visibilityBtn.addEventListener('click', function() {
+                        toggleContentVisibility(this, item.short_id);
+                    });
+                    
+                    actions.appendChild(linkDiv);
+                    actions.appendChild(visibilityBtn);
                     
                     li.appendChild(header);
-                    li.appendChild(titleDiv);
-                    li.appendChild(idDiv);
-                    li.appendChild(linkDiv);
+                    li.appendChild(title);
+                    li.appendChild(actions);
                     
                     contentListEl.appendChild(li);
                 });
@@ -234,6 +243,50 @@
                 contentListEl.style.display = 'none';
                 noContentEl.style.display = 'block';
             }
+        }
+        
+        // 切换内容公开/隐藏状态
+        function toggleContentVisibility(button, contentId) {
+            // 禁用按钮，防止重复点击
+            button.disabled = true;
+            
+            // 准备表单数据
+            const formData = new FormData();
+            formData.append('content_id', contentId);
+            
+            // 发送请求
+            fetch('/api/toggle-visibility', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 更新按钮状态
+                    if (data.is_public) {
+                        button.innerHTML = '<i class="fas fa-eye"></i> 公开';
+                        button.classList.remove('private');
+                        button.classList.add('public');
+                    } else {
+                        button.innerHTML = '<i class="fas fa-eye-slash"></i> 隐藏';
+                        button.classList.remove('public');
+                        button.classList.add('private');
+                    }
+                    
+                    // 显示成功消息
+                    showToast(data.message);
+                } else {
+                    throw new Error(data.error || '操作失败');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('操作失败: ' + error.message);
+            })
+            .finally(() => {
+                // 重新启用按钮
+                button.disabled = false;
+            });
         }
     </script>
 </body>

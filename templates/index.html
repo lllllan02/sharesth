@@ -24,9 +24,18 @@
         </div>
         
         <!-- 标题输入 (对所有类型通用) -->
-        <div class="input-group">
-            <label class="input-label" for="content-title">标题 (可选)</label>
-            <input type="text" id="content-title" class="title-input" name="content-title" placeholder="为您的分享添加一个标题">
+        <div class="common-content">
+            <div class="input-group">
+                <label for="content-title" class="input-label">标题 (可选)</label>
+                <input type="text" id="content-title" class="title-input" placeholder="输入内容标题...">
+            </div>
+            
+            <div class="privacy-setting">
+                <label class="privacy-label">
+                    <input type="checkbox" id="is-public"> 
+                    <span>公开此内容 <i class="fas fa-question-circle" title="公开内容将显示在公共页面上，任何人都可以浏览"></i></span>
+                </label>
+            </div>
         </div>
         
         <!-- Markdown 内容 -->
@@ -106,6 +115,7 @@
         <div class="footer">
             <a href="/my-content"><i class="fas fa-list"></i> 我的分享</a>
             <a href="/search"><i class="fas fa-search"></i> 查询用户分享</a>
+            <a href="/public"><i class="fas fa-globe"></i> 浏览公开内容</a>
         </div>
     </div>
     
@@ -408,7 +418,7 @@
             disableButton(button);
             
             const title = document.getElementById('content-title').value.trim();
-            console.log('标题:', title); // 添加调试信息
+            const isPublic = document.getElementById('is-public').checked;
             
             const formData = new FormData();
             formData.append('content', mdContent);
@@ -416,6 +426,7 @@
             if (title) {
                 formData.append('title', title);
             }
+            formData.append('is_public', isPublic ? 'true' : 'false');
             
             uploadContent(formData, button, originalHTML);
         });
@@ -434,6 +445,7 @@
             disableButton(button);
             
             const title = document.getElementById('content-title').value.trim();
+            const isPublic = document.getElementById('is-public').checked;
             
             const formData = new FormData();
             formData.append('content', textContent);
@@ -441,6 +453,7 @@
             if (title) {
                 formData.append('title', title);
             }
+            formData.append('is_public', isPublic ? 'true' : 'false');
             
             uploadContent(formData, button, originalHTML);
         });
@@ -459,6 +472,7 @@
             disableButton(button);
             
             const title = document.getElementById('content-title').value.trim();
+            const isPublic = document.getElementById('is-public').checked;
             
             const formData = new FormData();
             formData.append('file', imageFile);
@@ -466,6 +480,7 @@
             if (title) {
                 formData.append('title', title);
             }
+            formData.append('is_public', isPublic ? 'true' : 'false');
             
             uploadContent(formData, button, originalHTML);
         });

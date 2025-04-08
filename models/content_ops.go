@@ -43,6 +43,27 @@ func FindContentsBySource(source string) []map[string]interface{} {
 			"createTime": content.CreateTime,
 			"link":       "/" + content.ShortID,
 			"title":      content.Title,
+			"is_public":  content.IsPublic,
+		})
+	}
+
+	return results
+}
+
+// FindPublicContents 查找所有公开的内容
+func FindPublicContents() []map[string]interface{} {
+	var contents []Content
+	DB.Where("is_public = ?", true).Order("create_time DESC").Find(&contents)
+
+	var results []map[string]interface{}
+	for _, content := range contents {
+		results = append(results, map[string]interface{}{
+			"id":         content.ID,
+			"short_id":   content.ShortID,
+			"type":       content.Type,
+			"createTime": content.CreateTime,
+			"link":       "/" + content.ShortID,
+			"title":      content.Title,
 		})
 	}
 

@@ -36,8 +36,11 @@ func main() {
 	r.POST("/upload/image", handlers.UploadImageForMD) // Markdown编辑器的图片上传
 	r.GET("/my-content", handlers.MyContentPageHandler)
 	r.GET("/api/my-content", handlers.MyContentAPIHandler)
+	r.POST("/api/toggle-visibility", handlers.ToggleContentVisibilityHandler)
 	r.GET("/search", handlers.SourceSearchPageHandler)
 	r.GET("/api/source-content", handlers.SourceContentHandler)
+	r.GET("/public", handlers.PublicContentPageHandler)
+	r.GET("/api/public-content", handlers.PublicContentAPIHandler)
 	r.GET("/:shortID", handlers.ShortLinkHandler)
 
 	// 确保上传目录存在

@@ -13,6 +13,7 @@ type Content struct {
 	Source     string    `json:"source" gorm:"type:varchar(100);index"` // 数据来源（IP地址）
 	CreateTime time.Time `json:"create_time" gorm:"index"`              // 创建时间
 	Title      string    `json:"title" gorm:"type:varchar(255)"`        // 内容标题
+	IsPublic   bool      `json:"is_public" gorm:"default:false"`        // 是否公开，默认为不公开
 }
 
 // 数据目录路径
