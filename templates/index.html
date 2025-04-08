@@ -5,6 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShareSTH - 快速分享文本和图片</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            padding: 15px;
+            border-top: 1px solid #eee;
+        }
+        .footer a {
+            color: #666;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+            color: #333;
+        }
+        .title-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .input-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -16,11 +48,16 @@
         </div>
         
         <div class="content active" id="text-content">
+            <label class="input-label">标题 (可选)</label>
+            <input type="text" id="text-title" class="title-input" placeholder="为您的分享添加一个标题">
+            <label class="input-label">内容</label>
             <textarea id="text-input" placeholder="在这里粘贴您要分享的文本..."></textarea>
             <button class="button" id="share-text">分享文本</button>
         </div>
         
         <div class="content" id="image-content">
+            <label class="input-label">标题 (可选)</label>
+            <input type="text" id="image-title" class="title-input" placeholder="为您的图片添加一个标题">
             <div class="file-input-wrapper">
                 <div class="file-input-button">选择图片</div>
                 <input type="file" id="image-input" accept="image/*">
@@ -35,6 +72,11 @@
             <p>您的短链接已生成：</p>
             <p class="shortlink" id="shortlink"></p>
             <button class="button copy-button" id="copy-button">复制链接</button>
+        </div>
+        
+        <div class="footer">
+            <a href="/my-content">我的分享</a>
+            <a href="/search">查询用户分享</a>
         </div>
     </div>
     
@@ -77,8 +119,13 @@
                 return;
             }
             
+            const title = document.getElementById('text-title').value.trim();
+            
             const formData = new FormData();
             formData.append('text', text);
+            if (title) {
+                formData.append('title', title);
+            }
             
             fetch('/upload', {
                 method: 'POST',
@@ -103,8 +150,13 @@
                 return;
             }
             
+            const title = document.getElementById('image-title').value.trim();
+            
             const formData = new FormData();
             formData.append('image', fileInput.files[0]);
+            if (title) {
+                formData.append('title', title);
+            }
             
             fetch('/upload', {
                 method: 'POST',
