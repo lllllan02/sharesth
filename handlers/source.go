@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"net/http"
-	"sharesth/utils"
+	"sharesth/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,7 +22,7 @@ func SourceContentHandler(c *gin.Context) {
 	}
 
 	// 查询所有来自该来源的内容
-	results := utils.FindContentsBySource(source)
+	results := models.FindContentsBySource(source)
 
 	// 返回JSON结果
 	c.JSON(http.StatusOK, gin.H{

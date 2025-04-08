@@ -43,8 +43,8 @@ func UploadHandler(c *gin.Context) {
 			Title:      title,
 		}
 
-		// 保存内容到文件
-		if err := utils.SaveContent(shortID, content); err != nil {
+		// 保存内容到数据库
+		if err := models.SaveContent(shortID, content); err != nil {
 			log.Printf("保存内容失败: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "保存内容失败"})
 			return
@@ -85,8 +85,8 @@ func UploadHandler(c *gin.Context) {
 			Title:      title,
 		}
 
-		// 保存内容到文件
-		if err := utils.SaveContent(shortID, content); err != nil {
+		// 保存内容到数据库
+		if err := models.SaveContent(shortID, content); err != nil {
 			log.Printf("保存内容失败: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "保存内容失败"})
 			return

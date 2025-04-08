@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"sharesth/models"
 	"sharesth/utils"
 )
 
@@ -19,7 +20,7 @@ func MyContentAPIHandler(c *gin.Context) {
 	clientIdentifier := utils.GetClientIdentifier(c.Request)
 
 	// 查询所有来自该客户端的内容
-	results := utils.FindContentsBySource(clientIdentifier)
+	results := models.FindContentsBySource(clientIdentifier)
 
 	// 返回JSON结果
 	c.JSON(http.StatusOK, gin.H{

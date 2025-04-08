@@ -8,14 +8,17 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"sharesth/handlers"
-	"sharesth/utils"
+	"sharesth/models"
 )
 
 func main() {
-	// 加载索引
-	if err := utils.LoadIndex(); err != nil {
-		log.Fatalf("加载索引失败: %v", err)
+	// 初始化数据库连接
+	if err := models.InitDB(); err != nil {
+		log.Fatalf("初始化数据库失败: %v", err)
 	}
+
+	// 获取sqlDB以便在程序结束时关闭
+	defer models.CloseDB()
 
 	// 创建Gin路由
 	r := gin.Default()
@@ -36,8 +39,7 @@ func main() {
 	r.GET("/api/source-content", handlers.SourceContentHandler)
 	r.GET("/:shortID", handlers.ShortLinkHandler)
 
-	// 确保数据和上传目录存在
-	os.MkdirAll("data", 0755)
+	// 确保上传目录存在
 	os.MkdirAll("uploads", 0755)
 
 	// 启动服务器

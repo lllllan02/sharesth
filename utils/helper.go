@@ -12,6 +12,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"sharesth/models"
 )
 
 // Cookie相关常量
@@ -33,9 +35,6 @@ func GenerateShortID(length int) string {
 // SaveUploadedImage 保存上传的图片并返回唯一的文件路径
 // 如果发现相同内容的文件已存在，则直接返回已存在的文件路径
 func SaveUploadedImage(file io.Reader, originalFilename string) (string, error) {
-	// 获取MD5存储实例
-	md5Store := GetFileMD5Store()
-
 	// 确保上传目录存在
 	if _, err := os.Stat(UploadsDir); os.IsNotExist(err) {
 		if err := os.MkdirAll(UploadsDir, 0755); err != nil {
@@ -68,7 +67,7 @@ func SaveUploadedImage(file io.Reader, originalFilename string) (string, error) 
 	}
 
 	// 检查是否已存在相同MD5的文件
-	existingFile, found := md5Store.Get(contentMD5)
+	existingFile, found := models.FindFileMD5(contentMD5)
 	if found {
 		// 验证文件是否真的存在
 		if _, err := os.Stat(existingFile); err == nil {
@@ -76,7 +75,7 @@ func SaveUploadedImage(file io.Reader, originalFilename string) (string, error) 
 			return existingFile, nil
 		}
 		// 如果文件不存在，从索引中删除并继续处理
-		md5Store.Delete(contentMD5)
+		models.DeleteFileMD5(contentMD5)
 		log.Printf("从MD5索引中删除不存在的文件: %s", contentMD5)
 	}
 
@@ -96,20 +95,26 @@ func SaveUploadedImage(file io.Reader, originalFilename string) (string, error) 
 		return "", fmt.Errorf("重置临时文件位置失败: %v", err)
 	}
 
+	// 创建目标文件
 	targetFile, err := os.Create(targetPath)
 	if err != nil {
 		return "", fmt.Errorf("创建目标文件失败: %v", err)
 	}
 	defer targetFile.Close()
 
+	// 复制内容到目标文件
 	if _, err := io.Copy(targetFile, tempFile); err != nil {
 		return "", fmt.Errorf("复制到目标文件失败: %v", err)
 	}
 
-	// 存储文件MD5到索引
-	md5Store.Set(contentMD5, targetPath)
-	log.Printf("添加文件到MD5索引: %s -> %s", contentMD5, targetPath)
+	// 保存MD5记录
+	err = models.SaveFileMD5(contentMD5, targetPath)
+	if err != nil {
+		log.Printf("保存MD5记录失败: %v", err)
+		// 继续执行，不要因为这个错误中断上传
+	}
 
+	log.Printf("成功保存文件: %s (MD5: %s)", targetPath, contentMD5)
 	return targetPath, nil
 }
 

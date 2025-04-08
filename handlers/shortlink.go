@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"sharesth/utils"
+	"sharesth/models"
 )
 
 // ShortLinkHandler 处理短链接访问
@@ -14,7 +14,7 @@ func ShortLinkHandler(c *gin.Context) {
 	shortID := c.Param("shortID")
 
 	// 检查索引中是否存在此短链接
-	content, err := utils.LoadContent(shortID)
+	content, err := models.LoadContent(shortID)
 	if err != nil {
 		log.Printf("加载内容失败: %v", err)
 		c.HTML(http.StatusNotFound, "error.html", gin.H{
