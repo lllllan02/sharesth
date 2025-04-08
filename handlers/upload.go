@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -38,22 +37,20 @@ func UploadImageForMD(c *gin.Context) {
 		return
 	}
 
-	// 确保上传目录存在
-	uploadDir := "uploads/images"
-	if err := os.MkdirAll(uploadDir, 0755); err != nil {
+	// 打开上传的文件
+	src, err := file.Open()
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
-			"error":   "创建上传目录失败: " + err.Error(),
+			"error":   "打开上传文件失败: " + err.Error(),
 		})
 		return
 	}
+	defer src.Close()
 
-	// 生成唯一文件名
-	filename := fmt.Sprintf("%d%s", time.Now().UnixNano(), ext)
-	filepath := filepath.Join(uploadDir, filename)
-
-	// 保存文件
-	if err := c.SaveUploadedFile(file, filepath); err != nil {
+	// 使用SaveUploadedImage保存文件并实现去重
+	filepath, err := utils.SaveUploadedImage(src, file.Filename)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
 			"error":   "保存文件失败: " + err.Error(),
@@ -146,19 +143,17 @@ func UploadHandler(c *gin.Context) {
 			return
 		}
 
-		// 创建上传目录（如果不存在）
-		uploadDir := filepath.Join("uploads", "images")
-		if err := os.MkdirAll(uploadDir, 0755); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "创建上传目录失败: " + err.Error()})
+		// 打开上传的文件
+		src, err := file.Open()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "打开上传文件失败: " + err.Error()})
 			return
 		}
+		defer src.Close()
 
-		// 生成唯一文件名
-		filename := fmt.Sprintf("%d_%s", time.Now().UnixNano(), filepath.Base(file.Filename))
-		filepath := filepath.Join(uploadDir, filename)
-
-		// 保存文件
-		if err := c.SaveUploadedFile(file, filepath); err != nil {
+		// 使用SaveUploadedImage保存文件并实现去重
+		filepath, err := utils.SaveUploadedImage(src, file.Filename)
+		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "保存图片失败: " + err.Error()})
 			return
 		}
