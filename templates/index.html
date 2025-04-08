@@ -58,6 +58,8 @@
     
     <!-- 引入Toastify JS库 -->
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <!-- 引入公共JS -->
+    <script src="/static/js/common.js"></script>
     
     <script>
         // 标签切换
@@ -89,30 +91,6 @@
                 reader.readAsDataURL(file);
             }
         });
-        
-        // 使用Toastify显示提示
-        function showToast(message) {
-            Toastify({
-                text: message,
-                duration: 2000,
-                close: false,
-                gravity: "center", // 居中显示
-                position: "center", // 居中显示
-                backgroundColor: "linear-gradient(to right, #1976D2, #2196F3)",
-                className: "toast-message",
-                stopOnFocus: false // 用户聚焦时不停止
-            }).showToast();
-        }
-        
-        // 防抖函数
-        function debounce(func, wait) {
-            let timeout;
-            return function(...args) {
-                const context = this;
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(context, args), wait);
-            };
-        }
         
         // 禁用按钮函数
         function disableButton(button, text) {
@@ -255,15 +233,8 @@
         
         // 复制链接
         document.getElementById('copy-button').addEventListener('click', function() {
-            const shortlinkText = document.getElementById('shortlink').textContent;
-            navigator.clipboard.writeText(shortlinkText)
-                .then(() => {
-                    showToast('链接已复制到剪贴板');
-                })
-                .catch(err => {
-                    console.error('无法复制链接: ', err);
-                    showToast('复制失败，请手动复制链接');
-                });
+            const shortLink = document.getElementById('shortlink').textContent;
+            copyToClipboard(shortLink);
         });
     </script>
 </body>

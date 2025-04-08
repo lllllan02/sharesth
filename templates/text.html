@@ -5,28 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SharedSTH - 分享内容</title>
     <link rel="stylesheet" href="/static/css/styles.css">
+    <!-- 引入Toastify CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <style>
+        .content-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>分享的内容</h1>
+        {{if .Title}}
+        <div class="content-title" id="title">{{.Title}}</div>
+        {{end}}
         <div class="content-box" id="content">{{.Content}}</div>
         
         <button class="button copy-button" id="copy-button">复制内容</button>
         <a href="/" class="button">返回首页</a>
     </div>
     
+    <!-- 引入Toastify JS库 -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <!-- 引入公共JS -->
+    <script src="/static/js/common.js"></script>
+    
     <script>
         // 复制内容
         document.getElementById('copy-button').addEventListener('click', function() {
             const content = document.getElementById('content').textContent;
-            navigator.clipboard.writeText(content)
-                .then(() => {
-                    alert('内容已复制到剪贴板');
-                })
-                .catch(err => {
-                    console.error('无法复制内容: ', err);
-                    alert('复制失败，请手动复制内容');
-                });
+            copyToClipboard(content);
         });
     </script>
 </body>
