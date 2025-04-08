@@ -74,8 +74,19 @@
         <div class="result hidden" id="result">
             <p>您的短链接已生成：</p>
             <p class="shortlink" id="shortlink"></p>
-            <button class="button copy-button" id="copy-button"><i class="fas fa-copy"></i> 复制链接</button>
-            <button class="button reset-button" id="reset-form"><i class="fas fa-redo"></i> 继续分享</button>
+            <div class="button-group">
+                <button class="button copy-button" id="copy-button"><i class="fas fa-copy"></i> 复制链接</button>
+                <button class="button reset-button" id="reset-form"><i class="fas fa-redo"></i> 继续分享</button>
+            </div>
+            
+            <div class="social-share hidden">
+                <p>分享到社交平台：</p>
+                <div class="share-buttons">
+                    <button class="share-btn wechat-btn" id="wechat-share" title="分享到微信"><i class="fab fa-weixin"></i></button>
+                    <button class="share-btn qq-btn" id="qq-share" title="分享到QQ"><i class="fab fa-qq"></i></button>
+                    <button class="share-btn weibo-btn" id="weibo-share" title="分享到微博"><i class="fab fa-weibo"></i></button>
+                </div>
+            </div>
         </div>
         
         <div class="tips" id="markdown-tips">
@@ -362,6 +373,27 @@
             copyToClipboard(shortlink);
         });
         
+        // 社交分享功能
+        document.getElementById('wechat-share').addEventListener('click', function() {
+            const shortLink = document.getElementById('shortlink').textContent;
+            // 对于微信，通常是显示二维码供扫描，或打开微信网页版
+            showToast('请打开微信扫一扫，扫描链接二维码分享');
+            // 这里可以添加显示二维码的代码，或者直接打开微信的网页版分享
+            window.open(`https://w.url.cn/s/A${encodeURIComponent(shortLink)}`);
+        });
+        
+        document.getElementById('qq-share').addEventListener('click', function() {
+            const shortLink = document.getElementById('shortlink').textContent;
+            const title = document.getElementById('content-title').value.trim() || '分享内容';
+            window.open(`https://connect.qq.com/widget/shareqq/index.html?url=${encodeURIComponent(shortLink)}&title=${encodeURIComponent(title)}`);
+        });
+        
+        document.getElementById('weibo-share').addEventListener('click', function() {
+            const shortLink = document.getElementById('shortlink').textContent;
+            const title = document.getElementById('content-title').value.trim() || '分享内容';
+            window.open(`https://service.weibo.com/share/share.php?url=${encodeURIComponent(shortLink)}&title=${encodeURIComponent(title)}`);
+        });
+        
         // Markdown 分享
         document.getElementById('share-md').addEventListener('click', function() {
             const button = this;
@@ -455,14 +487,20 @@
                 if (data.error) {
                     throw new Error(data.error);
                 }
-                document.getElementById('shortlink').textContent = data.shortLink;
+                
+                // 显示结果并自动复制链接到剪贴板
+                const shortLink = data.shortLink;
+                document.getElementById('shortlink').textContent = shortLink;
                 document.getElementById('result').classList.remove('hidden');
+                
+                // 自动复制到剪贴板
+                copyToClipboard(shortLink);
                 
                 // 显示成功提示
                 const contentType = formData.get('type');
                 const typeText = contentType === 'markdown' ? 'Markdown' : 
                                 contentType === 'text' ? '文本' : '图片';
-                showToast(`${typeText}内容分享成功！`);
+                showToast(`${typeText}内容分享成功！链接已复制到剪贴板`);
                 
                 // 禁用输入区域
                 document.getElementById('content-title').setAttribute('readonly', 'readonly');
