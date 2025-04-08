@@ -2,10 +2,8 @@ package handlers
 
 import (
 	"fmt"
-	"io"
 	"log"
 	"net/http"
-	"os"
 	"path/filepath"
 	"time"
 
@@ -64,29 +62,17 @@ func UploadHandler(c *gin.Context) {
 	if err == nil {
 		defer file.Close()
 
-		// 确保上传目录存在
-		if _, err := os.Stat("uploads"); os.IsNotExist(err) {
-			os.Mkdir("uploads", 0755)
-		}
-
-		// 创建文件
-		filename := filepath.Join("uploads", fileHeader.Filename)
-		dst, err := os.Create(filename)
+		// 使用优化的文件保存函数
+		filename, err := utils.SaveUploadedImage(file, fileHeader.Filename)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "无法创建文件"})
-			return
-		}
-		defer dst.Close()
-
-		// 复制文件内容
-		if _, err = io.Copy(dst, file); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "文件上传失败"})
+			log.Printf("保存图片失败: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("图片保存失败: %v", err)})
 			return
 		}
 
 		// 生成默认标题（如果没有提供）
 		if title == "" {
-			title = "图片: " + fileHeader.Filename
+			title = "图片: " + filepath.Base(fileHeader.Filename)
 		}
 
 		// 生成短链接
