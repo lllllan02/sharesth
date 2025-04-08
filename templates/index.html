@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShareSTH - 快速分享文本和图片</title>
     <link rel="stylesheet" href="/static/css/styles.css">
+    <!-- 引入Toastify CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 </head>
 <body>
     <div class="container">
@@ -48,6 +50,9 @@
         </div>
     </div>
     
+    <!-- 引入Toastify JS库 -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    
     <script>
         // 标签切换
         document.querySelectorAll('.tab').forEach(tab => {
@@ -79,11 +84,25 @@
             }
         });
         
+        // 使用Toastify显示提示
+        function showToast(message) {
+            Toastify({
+                text: message,
+                duration: 2000,
+                close: false,
+                gravity: "center", // 居中显示
+                position: "center", // 居中显示
+                backgroundColor: "linear-gradient(to right, #1976D2, #2196F3)",
+                className: "toast-message",
+                stopOnFocus: false // 用户聚焦时不停止
+            }).showToast();
+        }
+        
         // 分享文本
         document.getElementById('share-text').addEventListener('click', function() {
             const text = document.getElementById('text-input').value.trim();
             if (!text) {
-                alert('请输入要分享的文本');
+                showToast('请输入要分享的文本');
                 return;
             }
             
@@ -106,7 +125,7 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('发生错误，请稍后重试');
+                showToast('发生错误，请稍后重试');
             });
         });
         
@@ -114,7 +133,7 @@
         document.getElementById('share-image').addEventListener('click', function() {
             const fileInput = document.getElementById('image-input');
             if (fileInput.files.length === 0) {
-                alert('请选择要分享的图片');
+                showToast('请选择要分享的图片');
                 return;
             }
             
@@ -137,7 +156,7 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('发生错误，请稍后重试');
+                showToast('发生错误，请稍后重试');
             });
         });
         
@@ -146,11 +165,11 @@
             const shortlinkText = document.getElementById('shortlink').textContent;
             navigator.clipboard.writeText(shortlinkText)
                 .then(() => {
-                    alert('链接已复制到剪贴板');
+                    showToast('链接已复制到剪贴板');
                 })
                 .catch(err => {
                     console.error('无法复制链接: ', err);
-                    alert('复制失败，请手动复制链接');
+                    showToast('复制失败，请手动复制链接');
                 });
         });
     </script>
