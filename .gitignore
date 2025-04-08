@@ -22,5 +22,5 @@ vendor/
 # 忽略 uploads 文件夹
 uploads/ 
 
-# 忽略 data 文件夹
-data/
+# 忽略 db 文件
+*.db

@@ -15,7 +15,7 @@ import (
 var DB *gorm.DB
 
 // SQLite数据库文件路径
-const DBFilePath = "data/sharesth.db"
+const DBFilePath = "sharesth.db"
 
 // InitDB 初始化数据库连接
 func InitDB() error {
