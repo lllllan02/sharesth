@@ -207,34 +207,4 @@ textarea:focus {
 
 #text-content, #image-content {
     padding: 5px 0;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-    .container {
-        padding: 20px 15px;
-        margin: 0 10px;
-    }
-    
-    h1 {
-        font-size: 24px;
-        margin-bottom: 15px;
-        padding-bottom: 10px;
-    }
-    
-    .tab {
-        padding: 8px 16px;
-        font-size: 14px;
-    }
-    
-    .button {
-        width: 100%;
-        margin: 10px 0;
-        padding: 10px 20px;
-    }
-    
-    .copy-button {
-        margin-left: 0;
-        margin-top: 10px;
-    }
 } 

@@ -24,6 +24,113 @@ type Content struct {
 // 存储短链接与内容的映射
 var contentMap = make(map[string]Content)
 
+// 数据目录路径
+const dataDir = "data"
+
+// 索引文件路径
+const indexFile = "data/index.json"
+
+// 保存内容到独立文件
+func saveContent(shortID string, content Content) error {
+	// 确保数据目录存在
+	if err := os.MkdirAll(dataDir, 0755); err != nil {
+		return err
+	}
+
+	// 保存索引信息
+	contentMap[shortID] = content
+
+	// 内容文件路径
+	contentFile := filepath.Join(dataDir, shortID+".json")
+
+	// 将内容保存为JSON文件
+	data, err := json.MarshalIndent(content, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	// 写入文件
+	if err := os.WriteFile(contentFile, data, 0644); err != nil {
+		return err
+	}
+
+	// 更新索引文件
+	return saveIndex()
+}
+
+// 保存索引信息
+func saveIndex() error {
+	// 只保存短链接到内容类型的映射，不保存内容数据
+	index := make(map[string]string)
+	for id, content := range contentMap {
+		index[id] = content.Type
+	}
+
+	// 将索引转换为JSON
+	data, err := json.MarshalIndent(index, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	// 写入索引文件
+	return os.WriteFile(indexFile, data, 0644)
+}
+
+// 加载索引信息
+func loadIndex() error {
+	// 检查索引文件是否存在
+	if _, err := os.Stat(indexFile); os.IsNotExist(err) {
+		return nil // 文件不存在，不需要加载
+	}
+
+	// 读取索引文件
+	data, err := os.ReadFile(indexFile)
+	if err != nil {
+		return err
+	}
+
+	// 解析索引数据
+	index := make(map[string]string)
+	if err := json.Unmarshal(data, &index); err != nil {
+		return err
+	}
+
+	// 初始化内容映射
+	contentMap = make(map[string]Content)
+	for id, contentType := range index {
+		contentMap[id] = Content{Type: contentType} // 先不加载内容数据
+	}
+
+	return nil
+}
+
+// 按需加载内容
+func loadContent(shortID string) (Content, error) {
+	// 检查内存中是否已有完整数据
+	content, exists := contentMap[shortID]
+	if exists && content.Data != "" {
+		return content, nil
+	}
+
+	// 否则从文件加载
+	contentFile := filepath.Join(dataDir, shortID+".json")
+	data, err := os.ReadFile(contentFile)
+	if err != nil {
+		return Content{}, err
+	}
+
+	// 解析内容数据
+	var loadedContent Content
+	if err := json.Unmarshal(data, &loadedContent); err != nil {
+		return Content{}, err
+	}
+
+	// 更新内存缓存
+	contentMap[shortID] = loadedContent
+
+	return loadedContent, nil
+}
+
 // 生成随机短链接
 func generateShortID(length int) string {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -63,7 +170,14 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	if textContent != "" {
 		// 生成短链接
 		shortID := generateShortID(6)
-		contentMap[shortID] = Content{Type: "text", Data: textContent}
+		content := Content{Type: "text", Data: textContent}
+
+		// 保存内容到文件
+		if err := saveContent(shortID, content); err != nil {
+			log.Printf("保存内容失败: %v", err)
+			http.Error(w, "保存内容失败", http.StatusInternalServerError)
+			return
+		}
 
 		// 返回短链接
 		response := map[string]string{
@@ -101,7 +215,14 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 
 		// 生成短链接
 		shortID := generateShortID(6)
-		contentMap[shortID] = Content{Type: "image", Data: filename}
+		content := Content{Type: "image", Data: filename}
+
+		// 保存内容到文件
+		if err := saveContent(shortID, content); err != nil {
+			log.Printf("保存内容失败: %v", err)
+			http.Error(w, "保存内容失败", http.StatusInternalServerError)
+			return
+		}
 
 		// 返回短链接
 		response := map[string]string{
@@ -120,9 +241,18 @@ func shortLinkHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	shortID := vars["shortID"]
 
-	content, ok := contentMap[shortID]
+	// 检查索引中是否存在此短链接
+	_, ok := contentMap[shortID]
 	if !ok {
 		http.Error(w, "短链接不存在", http.StatusNotFound)
+		return
+	}
+
+	// 按需加载内容
+	content, err := loadContent(shortID)
+	if err != nil {
+		log.Printf("加载内容失败: %v", err)
+		http.Error(w, "加载内容失败", http.StatusInternalServerError)
 		return
 	}
 
@@ -150,6 +280,12 @@ func main() {
 	os.MkdirAll("templates", 0755)
 	os.MkdirAll("static", 0755)
 	os.MkdirAll("uploads", 0755)
+	os.MkdirAll(dataDir, 0755)
+
+	// 加载索引信息
+	if err := loadIndex(); err != nil {
+		log.Printf("加载索引失败: %v", err)
+	}
 
 	// 创建路由
 	r := mux.NewRouter()
