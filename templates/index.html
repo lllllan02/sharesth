@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShareSTH - 快速分享文本和图片</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4a4a4a;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+            background-color: #f8f8f8;
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+        }
+        
+        .content {
+            display: none;
+        }
+        
+        .content.active {
+            display: block;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            resize: vertical;
+        }
+        
+        .button {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .button:hover {
+            background-color: #45a049;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e9f7ef;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .shortlink {
+            font-weight: bold;
+            word-break: break-all;
+        }
+        
+        .copy-button {
+            background-color: #2196F3;
+            margin-left: 10px;
+        }
+        
+        .copy-button:hover {
+            background-color: #0b7dda;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .file-input-button {
+            background-color: #e7e7e7;
+            color: black;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-block;
+        }
+        
+        #preview-container {
+            margin-top: 10px;
+        }
+        
+        #preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ShareSTH - 快速分享文本和图片</h1>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="text">文本</div>
+            <div class="tab" data-tab="image">图片</div>
+        </div>
+        
+        <div class="content active" id="text-content">
+            <textarea id="text-input" placeholder="在这里粘贴您要分享的文本..."></textarea>
+            <button class="button" id="share-text">分享文本</button>
+        </div>
+        
+        <div class="content" id="image-content">
+            <div class="file-input-wrapper">
+                <div class="file-input-button">选择图片</div>
+                <input type="file" id="image-input" accept="image/*">
+            </div>
+            <div id="preview-container">
+                <img id="preview-image" src="" alt="预览图片">
+            </div>
+            <button class="button" id="share-image">分享图片</button>
+        </div>
+        
+        <div class="result" id="result">
+            <p>您的短链接已生成：</p>
+            <p class="shortlink" id="shortlink"></p>
+            <button class="button copy-button" id="copy-button">复制链接</button>
+        </div>
+    </div>
+    
+    <script>
+        // 标签切换
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 移除所有活动标签和内容
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+                
+                // 添加活动类到当前标签
+                tab.classList.add('active');
+                
+                // 显示相应内容
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(`${tabId}-content`).classList.add('active');
+            });
+        });
+        
+        // 处理图片预览
+        document.getElementById('image-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('preview-image');
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // 分享文本
+        document.getElementById('share-text').addEventListener('click', function() {
+            const text = document.getElementById('text-input').value.trim();
+            if (!text) {
+                alert('请输入要分享的文本');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('text', text);
+            
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('shortlink').textContent = data.shortLink;
+                document.getElementById('result').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('发生错误，请稍后重试');
+            });
+        });
+        
+        // 分享图片
+        document.getElementById('share-image').addEventListener('click', function() {
+            const fileInput = document.getElementById('image-input');
+            if (fileInput.files.length === 0) {
+                alert('请选择要分享的图片');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+            
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('shortlink').textContent = data.shortLink;
+                document.getElementById('result').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('发生错误，请稍后重试');
+            });
+        });
+        
+        // 复制链接
+        document.getElementById('copy-button').addEventListener('click', function() {
+            const shortlinkText = document.getElementById('shortlink').textContent;
+            navigator.clipboard.writeText(shortlinkText)
+                .then(() => {
+                    alert('链接已复制到剪贴板');
+                })
+                .catch(err => {
+                    console.error('无法复制链接: ', err);
+                    alert('复制失败，请手动复制链接');
+                });
+        });
+    </script>
+</body>
+</html>

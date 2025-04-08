@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SharedSTH - 分享内容</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4a4a4a;
+        }
+        
+        .content-box {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .button {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .button:hover {
+            background-color: #45a049;
+        }
+        
+        .copy-button {
+            background-color: #2196F3;
+            margin-left: 10px;
+        }
+        
+        .copy-button:hover {
+            background-color: #0b7dda;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>分享的内容</h1>
+        <div class="content-box" id="content">{{.Content}}</div>
+        
+        <button class="button copy-button" id="copy-button">复制内容</button>
+        <a href="/" class="button">返回首页</a>
+    </div>
+    
+    <script>
+        // 复制内容
+        document.getElementById('copy-button').addEventListener('click', function() {
+            const content = document.getElementById('content').textContent;
+            navigator.clipboard.writeText(content)
+                .then(() => {
+                    alert('内容已复制到剪贴板');
+                })
+                .catch(err => {
+                    console.error('无法复制内容: ', err);
+                    alert('复制失败，请手动复制内容');
+                });
+        });
+    </script>
+</body>
+</html>
