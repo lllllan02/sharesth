@@ -117,7 +117,61 @@
             toolbar: [
                 'bold', 'italic', 'heading', '|', 
                 'quote', 'unordered-list', 'ordered-list', '|',
-                'link', 'image', 'table', '|',
+                'link', 
+                {
+                    name: 'custom-image',
+                    action: function(editor) {
+                        const cm = editor.codemirror;
+                        const stat = editor.getState(cm);
+                        const options = editor.options;
+                        const imageUploadFunction = options.imageUploadFunction;
+                        
+                        // 创建文件输入框
+                        const fileInput = document.createElement('input');
+                        fileInput.type = 'file';
+                        fileInput.accept = 'image/*';
+                        fileInput.style.display = 'none';
+                        document.body.appendChild(fileInput);
+                        
+                        // 模拟点击文件输入框
+                        fileInput.click();
+                        
+                        // 监听文件选择事件
+                        fileInput.onchange = function() {
+                            if (fileInput.files && fileInput.files.length > 0) {
+                                const file = fileInput.files[0];
+                                
+                                // 显示加载提示
+                                const cursor = cm.getCursor();
+                                const placeholderText = `![上传中...](正在上传 ${file.name})`;
+                                cm.replaceRange(placeholderText, cursor);
+                                
+                                // 调用上传函数
+                                if (imageUploadFunction) {
+                                    imageUploadFunction(file, 
+                                        // 成功回调
+                                        function(url) {
+                                            const imageMarkdown = `![${file.name}](${url})`;
+                                            cm.setValue(cm.getValue().replace(placeholderText, imageMarkdown));
+                                            showToast('图片上传成功！');
+                                        },
+                                        // 失败回调
+                                        function(error) {
+                                            cm.setValue(cm.getValue().replace(placeholderText, ''));
+                                            showToast('图片上传失败: ' + error);
+                                        }
+                                    );
+                                }
+                            }
+                            
+                            // 清理文件输入框
+                            document.body.removeChild(fileInput);
+                        };
+                    },
+                    className: 'fa fa-upload',
+                    title: '上传图片',
+                },
+                'image', 'table', '|',
                 'preview', 'side-by-side', 'fullscreen', '|',
                 'guide'
             ],
@@ -127,7 +181,28 @@
             },
             tabSize: 4,
             toolbarTips: true,
-            toolbarGuideIcon: true
+            toolbarGuideIcon: true,
+            imageUploadFunction: function(file, onSuccess, onError) {
+                const formData = new FormData();
+                formData.append('image', file);
+                
+                fetch('/upload/image', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success && result.file && result.file.url) {
+                        onSuccess(result.file.url);
+                    } else {
+                        onError(result.error || '上传失败');
+                    }
+                })
+                .catch(error => {
+                    console.error('上传图片失败:', error);
+                    onError('上传图片失败: ' + error.message);
+                });
+            }
         });
         
         // 标签切换功能
