@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SharedSTH - Markdown 内容</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <!-- 引入 Markdown 渲染库 CSS -->
+    <link rel="stylesheet" href="/static/vendor/github-markdown/github-markdown-light.css">
+    <!-- 引入语法高亮 CSS -->
+    <link rel="stylesheet" href="/static/vendor/highlight/github.min.css">
+    <!-- 引入 Toastify CSS -->
+    <link rel="stylesheet" href="/static/vendor/toastify/toastify.min.css">
+    <!-- 引入Font Awesome图标库 -->
+    <link rel="stylesheet" href="/static/vendor/fontawesome/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Markdown 内容</h1>
+        {{if .Title}}
+        <div class="content-title" id="title">{{.Title}}</div>
+        {{end}}
+        <div class="markdown-body" id="content"></div>
+        
+        <div class="action-buttons">
+            <button class="button copy-button" id="copy-button"><i class="fas fa-copy"></i> 复制原始内容</button>
+            <a href="/" class="button"><i class="fas fa-home"></i> 返回首页</a>
+        </div>
+    </div>
+    
+    <!-- 引入 Markdown 渲染库 -->
+    <script src="/static/vendor/marked/marked.min.js"></script>
+    <!-- 引入语法高亮 JS -->
+    <script src="/static/vendor/highlight/highlight.min.js"></script>
+    <!-- 引入 Toastify JS 库 -->
+    <script src="/static/vendor/toastify/toastify.min.js"></script>
+    <!-- 引入公共 JS -->
+    <script src="/static/js/common.js"></script>
+    
+    <!-- 传递内容数据 -->
+    <script>
+        // 配置marked选项
+        marked.setOptions({
+            highlight: function(code, lang) {
+                if (lang && hljs.getLanguage(lang)) {
+                    try { 
+                        return hljs.highlight(code, { language: lang }).value;
+                    } catch(e) {}
+                }
+                return hljs.highlightAuto(code).value;
+            },
+            breaks: true,
+            gfm: true
+        });
+        
+        // 解码HTML实体
+        function decodeHTMLEntities(text) {
+            const textarea = document.createElement('textarea');
+            textarea.innerHTML = text;
+            return textarea.value;
+        }
+        
+        // 获取内容
+        var rawContent = "{{.Content}}";
+        var decodedContent = decodeHTMLEntities(rawContent);
+
+        // 渲染Markdown内容
+        try {
+            document.getElementById('content').innerHTML = marked.parse(decodedContent);
+            
+            // 应用代码高亮
+            document.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightBlock(block);
+            });
+        } catch (e) {
+            console.error("Markdown渲染错误:", e);
+            document.getElementById('content').innerHTML = 
+                '<div class="error-preview">Markdown 渲染失败，可能是内容格式有问题。<br>错误: ' + e.message + '</div>';
+        }
+        
+        // 复制原始内容
+        document.getElementById('copy-button').addEventListener('click', function() {
+            copyToClipboard(decodedContent);
+        });
+    </script>
+</body>
+</html> 

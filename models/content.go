@@ -8,7 +8,7 @@ import (
 type Content struct {
 	ID         uint      `json:"id" gorm:"primaryKey"`
 	ShortID    string    `json:"short_id" gorm:"type:varchar(10);uniqueIndex"`
-	Type       string    `json:"type" gorm:"type:varchar(10)"`          // "text" 或 "image"
+	Type       string    `json:"type" gorm:"type:varchar(10)"`          // "text", "markdown" 或 "image"
 	Data       string    `json:"data" gorm:"type:text"`                 // 文本内容或图片路径
 	Source     string    `json:"source" gorm:"type:varchar(100);index"` // 数据来源（IP地址）
 	CreateTime time.Time `json:"create_time" gorm:"index"`              // 创建时间

@@ -3,91 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShareSTH - 快速分享文本和图片</title>
+    <title>ShareSTH - 内容分享平台</title>
+    <!-- 引入 Markdown 编辑器样式 (优先加载) -->
+    <link rel="stylesheet" href="/static/vendor/easymde/easymde.min.css">
     <link rel="stylesheet" href="/static/css/styles.css">
     <!-- 引入Toastify CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="/static/vendor/toastify/toastify.min.css">
+    <!-- 引入Font Awesome图标库 -->
+    <link rel="stylesheet" href="/static/vendor/fontawesome/all.min.css">
 </head>
 <body>
     <div class="container">
-        <h1>ShareSTH - 快速分享文本和图片</h1>
+        <h1>ShareSTH - 内容分享平台</h1>
         
+        <!-- 内容类型选择标签 -->
         <div class="tabs">
-            <div class="tab active" data-tab="text">文本</div>
-            <div class="tab" data-tab="image">图片</div>
+            <div class="tab active" data-type="markdown"><i class="fab fa-markdown"></i> Markdown</div>
+            <div class="tab" data-type="text"><i class="fas fa-file-alt"></i> 纯文本</div>
+            <div class="tab" data-type="image"><i class="fas fa-image"></i> 图片</div>
         </div>
         
-        <div class="content active" id="text-content">
-            <label class="input-label">标题 (可选)</label>
-            <input type="text" id="text-title" class="title-input" placeholder="为您的分享添加一个标题">
-            <label class="input-label">内容</label>
-            <textarea id="text-input" placeholder="在这里粘贴您要分享的文本..."></textarea>
+        <!-- 标题输入 (对所有类型通用) -->
+        <div class="input-group">
+            <label class="input-label" for="content-title">标题 (可选)</label>
+            <input type="text" id="content-title" class="title-input" name="content-title" placeholder="为您的分享添加一个标题">
+        </div>
+        
+        <!-- Markdown 内容 -->
+        <div class="content active" id="markdown-content">
+            <label class="input-label">Markdown 内容</label>
+            <div class="editor-container">
+                <textarea id="md-editor"></textarea>
+            </div>
+            
+            <div class="preview-toggle" id="toggle-preview"><i class="fas fa-eye"></i> 显示预览</div>
+            <div class="preview-container hidden" id="preview-container"></div>
+            
             <div class="button-group">
-                <button class="button" id="share-text">分享文本</button>
-                <button class="button reset-button" id="reset-text" style="display:none;">继续分享</button>
+                <button class="button" id="share-md"><i class="fas fa-share-alt"></i> 分享内容</button>
             </div>
         </div>
         
-        <div class="content" id="image-content">
-            <label class="input-label">标题 (可选)</label>
-            <input type="text" id="image-title" class="title-input" placeholder="为您的图片添加一个标题">
+        <!-- 纯文本内容 -->
+        <div class="content hidden" id="text-content">
+            <label class="input-label">文本内容</label>
+            <textarea id="text-editor" placeholder="在这里输入要分享的纯文本内容..."></textarea>
+            
+            <div class="button-group">
+                <button class="button" id="share-text"><i class="fas fa-share-alt"></i> 分享内容</button>
+            </div>
+        </div>
+        
+        <!-- 图片内容 -->
+        <div class="content hidden" id="image-content">
+            <label class="input-label">上传图片</label>
             <div class="file-input-wrapper">
-                <div class="file-input-button">选择图片</div>
-                <input type="file" id="image-input" accept="image/*">
+                <div class="file-input-button"><i class="fas fa-upload"></i> 选择图片文件</div>
+                <input type="file" id="image-upload" accept="image/*">
             </div>
-            <div id="preview-container">
-                <img id="preview-image" src="" alt="预览图片">
+            
+            <div class="image-preview-container hidden" id="image-preview-wrapper">
+                <img id="preview-image" src="#" alt="预览图片">
             </div>
+            
             <div class="button-group">
-                <button class="button" id="share-image">分享图片</button>
-                <button class="button reset-button" id="reset-image" style="display:none;">继续分享</button>
+                <button class="button" id="share-image" disabled><i class="fas fa-share-alt"></i> 分享图片</button>
             </div>
         </div>
         
-        <div class="result" id="result">
+        <div class="result hidden" id="result">
             <p>您的短链接已生成：</p>
             <p class="shortlink" id="shortlink"></p>
-            <button class="button copy-button" id="copy-button">复制链接</button>
+            <button class="button copy-button" id="copy-button"><i class="fas fa-copy"></i> 复制链接</button>
+            <button class="button reset-button" id="reset-form"><i class="fas fa-redo"></i> 继续分享</button>
+        </div>
+        
+        <div class="tips" id="markdown-tips">
+            <h3><i class="fas fa-lightbulb"></i> Markdown 小技巧</h3>
+            <ul>
+                <li><i class="fas fa-heading"></i> 使用 # 创建标题 (# 一级标题, ## 二级标题)</li>
+                <li><i class="fas fa-bold"></i> 使用 **文本** 或 __文本__ 来加粗文本</li>
+                <li><i class="fas fa-italic"></i> 使用 *文本* 或 _文本_ 来斜体显示</li>
+                <li><i class="fas fa-list-ul"></i> 使用 - 或 * 创建无序列表</li>
+                <li><i class="fas fa-list-ol"></i> 使用 1. 2. 3. 创建有序列表</li>
+                <li><i class="fas fa-link"></i> 插入链接: [链接文本](URL)</li>
+                <li><i class="fas fa-image"></i> 插入图片: ![替代文本](图片URL)</li>
+                <li><i class="fas fa-table"></i> 创建表格: | 表头 | 表头 | 然后下一行 | --- | --- |</li>
+            </ul>
         </div>
         
         <div class="footer">
-            <a href="/my-content">我的分享</a>
-            <a href="/search">查询用户分享</a>
+            <a href="/my-content"><i class="fas fa-list"></i> 我的分享</a>
+            <a href="/search"><i class="fas fa-search"></i> 查询用户分享</a>
         </div>
     </div>
     
+    <!-- 引入 Markdown 编辑器 -->
+    <script src="/static/vendor/easymde/easymde.min.js"></script>
+    <!-- 引入 Markdown 渲染库 -->
+    <script src="/static/vendor/marked/marked.min.js"></script>
     <!-- 引入Toastify JS库 -->
-    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="/static/vendor/toastify/toastify.min.js"></script>
     <!-- 引入公共JS -->
     <script src="/static/js/common.js"></script>
     
     <script>
-        // 标签切换
+        // 初始化 Markdown 编辑器
+        const easyMDE = new EasyMDE({
+            element: document.getElementById('md-editor'),
+            spellChecker: false,
+            autofocus: true,
+            placeholder: '在这里编写您要分享的 Markdown 内容...',
+            toolbar: [
+                'bold', 'italic', 'heading', '|', 
+                'quote', 'unordered-list', 'ordered-list', '|',
+                'link', 'image', 'table', '|',
+                'preview', 'side-by-side', 'fullscreen', '|',
+                'guide'
+            ],
+            status: false,
+            renderingConfig: {
+                codeSyntaxHighlighting: true,
+            },
+            tabSize: 4,
+            toolbarTips: true,
+            toolbarGuideIcon: true
+        });
+        
+        // 标签切换功能
         document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                // 移除所有活动标签和内容
+            tab.addEventListener('click', function() {
+                // 如果已经显示了结果，先重置表单
+                if (!document.getElementById('result').classList.contains('hidden')) {
+                    resetForm();
+                }
+                
+                // 移除所有标签的active类
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+                // 给当前点击的标签添加active类
+                this.classList.add('active');
                 
-                // 添加活动类到当前标签
-                tab.classList.add('active');
+                // 隐藏所有内容
+                document.querySelectorAll('.content').forEach(content => content.classList.add('hidden'));
                 
-                // 显示相应内容
-                const tabId = tab.getAttribute('data-tab');
-                document.getElementById(`${tabId}-content`).classList.add('active');
+                // 显示对应的内容
+                const type = this.getAttribute('data-type');
+                document.getElementById(`${type}-content`).classList.remove('hidden');
+                
+                // 显示或隐藏 Markdown 小技巧
+                if (type === 'markdown') {
+                    document.getElementById('markdown-tips').style.display = 'block';
+                } else {
+                    document.getElementById('markdown-tips').style.display = 'none';
+                }
             });
         });
         
-        // 处理图片预览
-        document.getElementById('image-input').addEventListener('change', function(e) {
-            const file = e.target.files[0];
+        // 预览切换
+        document.getElementById('toggle-preview').addEventListener('click', function() {
+            const previewContainer = document.getElementById('preview-container');
+            
+            if (previewContainer.classList.contains('hidden')) {
+                // 显示预览前清空容器
+                previewContainer.innerHTML = '';
+                
+                // 显示预览
+                previewContainer.classList.remove('hidden');
+                
+                try {
+                    // 渲染 Markdown 内容
+                    const markdownContent = easyMDE.value();
+                    if (markdownContent.trim()) {
+                        // 使用 marked 解析 Markdown
+                        const html = marked.parse(markdownContent);
+                        previewContainer.innerHTML = html;
+                    } else {
+                        previewContainer.innerHTML = '<div class="empty-preview">请先输入 Markdown 内容</div>';
+                    }
+                } catch (error) {
+                    console.error('Markdown 渲染出错:', error);
+                    previewContainer.innerHTML = '<div class="error-preview">Markdown 渲染失败，请检查内容格式</div>';
+                }
+                
+                this.innerHTML = '<i class="fas fa-eye-slash"></i> 隐藏预览';
+            } else {
+                // 隐藏预览
+                previewContainer.classList.add('hidden');
+                this.innerHTML = '<i class="fas fa-eye"></i> 显示预览';
+            }
+        });
+        
+        // 图片上传预览
+        document.getElementById('image-upload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const preview = document.getElementById('preview-image');
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                }
+                    const previewWrapper = document.getElementById('image-preview-wrapper');
+                    const previewImage = document.getElementById('preview-image');
+                    
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                    previewWrapper.classList.remove('hidden');
+                    
+                    // 启用分享按钮
+                    document.getElementById('share-image').disabled = false;
+                };
                 reader.readAsDataURL(file);
             }
         });
@@ -97,7 +218,7 @@
             button.disabled = true;
             button.style.backgroundColor = '#BBDEFB';
             button.style.cursor = 'not-allowed';
-            button.textContent = text || '处理中...';
+            button.innerHTML = text || '<i class="fas fa-spinner fa-spin"></i> 处理中...';
         }
         
         // 重置按钮状态
@@ -105,137 +226,176 @@
             button.disabled = false;
             button.style.backgroundColor = '#2196F3';
             button.style.cursor = 'pointer';
-            button.textContent = originalText;
+            button.innerHTML = originalText;
         }
         
-        // 重置文本表单
-        function resetTextForm() {
-            document.getElementById('text-title').value = '';
-            document.getElementById('text-input').value = '';
-            document.getElementById('share-text').style.display = 'block';
-            document.getElementById('reset-text').style.display = 'none';
-            document.getElementById('result').style.display = 'none';
-        }
-        
-        // 重置图片表单
-        function resetImageForm() {
-            document.getElementById('image-title').value = '';
-            document.getElementById('image-input').value = '';
-            document.getElementById('preview-image').style.display = 'none';
-            document.getElementById('preview-image').src = '';
-            document.getElementById('share-image').style.display = 'block';
-            document.getElementById('reset-image').style.display = 'none';
-            document.getElementById('result').style.display = 'none';
-        }
-        
-        // 继续分享文本按钮事件
-        document.getElementById('reset-text').addEventListener('click', function() {
-            resetTextForm();
-        });
-        
-        // 继续分享图片按钮事件
-        document.getElementById('reset-image').addEventListener('click', function() {
-            resetImageForm();
-        });
-        
-        // 分享文本
-        document.getElementById('share-text').addEventListener('click', debounce(function() {
-            const button = this;
-            const originalText = button.textContent;
+        // 重置表单
+        function resetForm() {
+            // 清除标题
+            document.getElementById('content-title').value = '';
+            document.getElementById('content-title').removeAttribute('readonly');
             
-            const text = document.getElementById('text-input').value.trim();
-            if (!text) {
-                showToast('请输入要分享的文本');
+            // 重置 Markdown 编辑器
+            easyMDE.value('');
+            easyMDE.codemirror.setOption('readOnly', false);
+            
+            // 重置文本编辑器
+            document.getElementById('text-editor').value = '';
+            document.getElementById('text-editor').removeAttribute('readonly');
+            
+            // 重置图片上传
+            document.getElementById('image-upload').value = '';
+            document.getElementById('preview-image').src = '#';
+            document.getElementById('image-preview-wrapper').classList.add('hidden');
+            document.getElementById('share-image').disabled = true;
+            
+            // 恢复所有按钮状态
+            document.querySelectorAll('button.button').forEach(btn => {
+                btn.disabled = false;
+                btn.style.backgroundColor = '#2196F3';
+                btn.style.cursor = 'pointer';
+            });
+            
+            // 重置分享按钮文本
+            document.getElementById('share-md').innerHTML = '<i class="fas fa-share-alt"></i> 分享内容';
+            document.getElementById('share-text').innerHTML = '<i class="fas fa-share-alt"></i> 分享内容';
+            document.getElementById('share-image').innerHTML = '<i class="fas fa-share-alt"></i> 分享图片';
+            
+            // 隐藏结果区域
+            document.getElementById('result').classList.add('hidden');
+            document.getElementById('shortlink').textContent = '';
+            
+            // 隐藏预览
+            document.getElementById('preview-container').classList.add('hidden');
+            document.getElementById('toggle-preview').innerHTML = '<i class="fas fa-eye"></i> 显示预览';
+        }
+        
+        // 继续分享按钮事件
+        document.getElementById('reset-form').addEventListener('click', function() {
+            resetForm();
+        });
+        
+        // 复制链接
+        document.getElementById('copy-button').addEventListener('click', function() {
+            const shortlink = document.getElementById('shortlink').textContent;
+            copyToClipboard(shortlink);
+        });
+        
+        // Markdown 分享
+        document.getElementById('share-md').addEventListener('click', function() {
+            const button = this;
+            const originalHTML = button.innerHTML;
+            
+            const mdContent = easyMDE.value().trim();
+            if (!mdContent) {
+                showToast('请输入要分享的 Markdown 内容');
                 return;
             }
             
-            disableButton(button, '分享中...');
+            disableButton(button);
             
-            const title = document.getElementById('text-title').value.trim();
+            const title = document.getElementById('content-title').value.trim();
+            console.log('标题:', title); // 添加调试信息
             
             const formData = new FormData();
-            formData.append('text', text);
+            formData.append('content', mdContent);
+            formData.append('type', 'markdown');
             if (title) {
                 formData.append('title', title);
             }
             
-            fetch('/upload', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('shortlink').textContent = data.shortLink;
-                document.getElementById('result').style.display = 'block';
-                // 隐藏分享按钮，显示继续分享按钮
-                button.style.display = 'none';
-                document.getElementById('reset-text').style.display = 'block';
-                
-                // 禁用文本输入区域
-                document.getElementById('text-title').setAttribute('readonly', 'readonly');
-                document.getElementById('text-input').setAttribute('readonly', 'readonly');
-                document.getElementById('text-title').style.opacity = '0.7';
-                document.getElementById('text-input').style.opacity = '0.7';
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showToast('发生错误，请稍后重试');
-                resetButton(button, originalText);
-            });
-        }, 500));
+            uploadContent(formData, button, originalHTML);
+        });
         
-        // 分享图片
-        document.getElementById('share-image').addEventListener('click', debounce(function() {
+        // 文本分享
+        document.getElementById('share-text').addEventListener('click', function() {
             const button = this;
-            const originalText = button.textContent;
+            const originalHTML = button.innerHTML;
             
-            const fileInput = document.getElementById('image-input');
-            if (fileInput.files.length === 0) {
+            const textContent = document.getElementById('text-editor').value.trim();
+            if (!textContent) {
+                showToast('请输入要分享的文本内容');
+                return;
+            }
+            
+            disableButton(button);
+            
+            const title = document.getElementById('content-title').value.trim();
+            
+            const formData = new FormData();
+            formData.append('content', textContent);
+            formData.append('type', 'text');
+            if (title) {
+                formData.append('title', title);
+            }
+            
+            uploadContent(formData, button, originalHTML);
+        });
+        
+        // 图片分享
+        document.getElementById('share-image').addEventListener('click', function() {
+            const button = this;
+            const originalHTML = button.innerHTML;
+            
+            const imageFile = document.getElementById('image-upload').files[0];
+            if (!imageFile) {
                 showToast('请选择要分享的图片');
                 return;
             }
             
-            disableButton(button, '分享中...');
+            disableButton(button);
             
-            const title = document.getElementById('image-title').value.trim();
+            const title = document.getElementById('content-title').value.trim();
             
             const formData = new FormData();
-            formData.append('image', fileInput.files[0]);
+            formData.append('file', imageFile);
+            formData.append('type', 'image');
             if (title) {
                 formData.append('title', title);
             }
             
+            uploadContent(formData, button, originalHTML);
+        });
+        
+        // 统一的上传处理函数
+        function uploadContent(formData, button, originalHTML) {
             fetch('/upload', {
                 method: 'POST',
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
                 document.getElementById('shortlink').textContent = data.shortLink;
-                document.getElementById('result').style.display = 'block';
-                // 隐藏分享按钮，显示继续分享按钮
-                button.style.display = 'none';
-                document.getElementById('reset-image').style.display = 'block';
+                document.getElementById('result').classList.remove('hidden');
                 
-                // 禁用图片输入区域
-                document.getElementById('image-title').setAttribute('readonly', 'readonly');
-                document.getElementById('image-input').disabled = true;
-                document.getElementById('image-title').style.opacity = '0.7';
-                document.querySelector('.file-input-button').style.opacity = '0.7';
-                document.querySelector('.file-input-button').style.pointerEvents = 'none';
+                // 显示成功提示
+                const contentType = formData.get('type');
+                const typeText = contentType === 'markdown' ? 'Markdown' : 
+                                contentType === 'text' ? '文本' : '图片';
+                showToast(`${typeText}内容分享成功！`);
+                
+                // 禁用输入区域
+                document.getElementById('content-title').setAttribute('readonly', 'readonly');
+                
+                const activeContent = document.querySelector('.content:not(.hidden)');
+                if (activeContent.id === 'markdown-content') {
+                    easyMDE.codemirror.setOption('readOnly', true);
+                } else if (activeContent.id === 'text-content') {
+                    document.getElementById('text-editor').setAttribute('readonly', 'readonly');
+                }
+                
+                // 重置按钮
+                resetButton(button, originalHTML);
             })
             .catch(error => {
-                console.error('Error:', error);
-                showToast('发生错误，请稍后重试');
-                resetButton(button, originalText);
+                console.error('上传失败:', error);
+                showToast('上传失败: ' + error.message);
+                resetButton(button, originalHTML);
             });
-        }, 500));
-        
-        // 复制链接
-        document.getElementById('copy-button').addEventListener('click', function() {
-            const shortLink = document.getElementById('shortlink').textContent;
-            copyToClipboard(shortLink);
-        });
+        }
     </script>
 </body>
 </html>

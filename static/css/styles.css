@@ -41,12 +41,19 @@ input[type="text"], .title-input, .search-input, .filter-input {
     font-size: 16px;
     box-sizing: border-box;
     transition: border-color 0.3s, box-shadow 0.3s;
+    background-color: #fff;
 }
 
 input[type="text"]:focus, .title-input:focus, .search-input:focus, .filter-input:focus, textarea:focus {
     outline: none;
     border-color: #2196F3;
     box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+}
+
+input[type="text"][readonly], textarea[readonly] {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+    opacity: 0.7;
 }
 
 .search-form input[type="text"] {
@@ -108,11 +115,11 @@ button:hover, .button:hover, .search-button:hover {
 }
 
 .reset-button {
-    background-color: #4CAF50;
+    background-color: #2196F3;
 }
 
 .reset-button:hover {
-    background-color: #388E3C;
+    background-color: #1976D2;
 }
 
 .search-form button {
@@ -150,15 +157,22 @@ button:hover, .button:hover, .search-button:hover {
     color: white;
 }
 
+/* 通用内容容器 */
+.common-content {
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 5px 0;
+    position: relative;
+    z-index: 5;
+}
+
 .content {
-    display: none;
     width: 100%;
     box-sizing: border-box;
     padding: 5px 0;
 }
 
 .content.active {
-    display: block;
     animation: fadeIn 0.3s ease;
 }
 
@@ -223,7 +237,7 @@ button:hover, .button:hover, .search-button:hover {
     background-color: #E3F2FD;
     color: #1976D2;
     padding: 12px 24px;
-    border-radius: 6px;
+    border-radius: 4px;
     cursor: pointer;
     display: inline-block;
     transition: all 0.3s ease;
@@ -234,7 +248,8 @@ button:hover, .button:hover, .search-button:hover {
     background-color: #BBDEFB;
 }
 
-#preview-container {
+/* 图片预览容器，区别于 Markdown 预览容器 */
+.image-preview-container {
     margin-top: 15px;
     background-color: #E3F2FD;
     padding: 10px;
@@ -259,7 +274,6 @@ button:hover, .button:hover, .search-button:hover {
     padding: 15px;
     background-color: #E3F2FD;
     border-radius: 6px;
-    display: none;
     border-left: 4px solid #2196F3;
     box-sizing: border-box;
     width: 100%;
@@ -277,22 +291,20 @@ button:hover, .button:hover, .search-button:hover {
     margin-left: 10px;
 }
 
-/* 内容显示框 */
+/* 内容显示容器 */
 .content-box {
-    background-color: #E3F2FD;
-    border: 1px solid #BBDEFB;
-    border-radius: 6px;
-    padding: 20px;
-    margin: 20px 0;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    box-shadow: 0 1px 3px rgba(33, 150, 243, 0.1);
-    width: 100%;
     box-sizing: border-box;
-    font-family: monospace;
-    font-size: 14px;
-    line-height: 1.5;
-    color: #333;
+    width: 100%;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    border: 1px solid #BBDEFB;
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.6;
+    font-family: 'Consolas', 'Monaco', 'Menlo', monospace;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 }
 
 /* 内容列表项 */
@@ -333,6 +345,11 @@ button:hover, .button:hover, .search-button:hover {
 }
 
 .type-text {
+    background-color: #E3F2FD;
+    color: #1976D2;
+}
+
+.type-markdown {
     background-color: #E3F2FD;
     color: #1976D2;
 }
@@ -462,4 +479,388 @@ button:hover, .button:hover, .search-button:hover {
 /* 辅助类 */
 .hidden {
     display: none !important;
+}
+
+.readonly {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Markdown 编辑器样式 - 强化版 */
+.editor-container {
+    margin-bottom: 20px;
+    margin-top: 10px;
+    min-height: 350px;
+}
+
+.editor-toolbar {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    flex-wrap: wrap;
+    border-radius: 4px 4px 0 0 !important;
+    border: 1px solid #BBDEFB !important;
+    background: #E3F2FD !important;
+    z-index: 10 !important;
+    position: relative !important;
+}
+
+.editor-toolbar a {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: #1976D2 !important;
+    border: none !important;
+    margin: 2px !important;
+    padding: 4px !important;
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    box-sizing: content-box !important;
+    text-align: center !important;
+    line-height: 24px !important;
+}
+
+.editor-toolbar a:hover, 
+.editor-toolbar a.active {
+    background: #BBDEFB !important;
+    border: none !important;
+}
+
+.editor-toolbar i.separator {
+    display: inline-block !important;
+    width: 1px !important;
+    margin: 0 6px !important;
+    height: 20px !important;
+    background-color: #ddd !important;
+    vertical-align: middle !important;
+}
+
+.CodeMirror {
+    height: 300px !important;
+    border-radius: 0 0 4px 4px !important;
+    border: 1px solid #BBDEFB !important;
+    border-top: none !important;
+    z-index: 1;
+    font-family: 'Consolas', 'Monaco', 'Menlo', monospace !important;
+    font-size: 14px !important;
+}
+
+.preview-container {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #BBDEFB;
+    border-radius: 4px;
+    background-color: #fff;
+    max-height: 500px;
+    overflow-y: auto;
+    width: 100%;
+    box-sizing: border-box;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* 预览容器中的 Markdown 元素样式 */
+.preview-container h1,
+.preview-container h2,
+.preview-container h3,
+.preview-container h4,
+.preview-container h5,
+.preview-container h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    color: #1976D2;
+    font-weight: 600;
+}
+
+.preview-container h1 {
+    font-size: 2em;
+    border-bottom: 1px solid #BBDEFB;
+    padding-bottom: 0.3em;
+}
+
+.preview-container h2 {
+    font-size: 1.5em;
+    border-bottom: 1px solid #BBDEFB;
+    padding-bottom: 0.3em;
+}
+
+.preview-container h3 {
+    font-size: 1.25em;
+}
+
+.preview-container p {
+    margin: 1em 0;
+}
+
+.preview-container ul,
+.preview-container ol {
+    margin: 1em 0;
+    padding-left: 2em;
+}
+
+.preview-container li {
+    margin: 0.5em 0;
+}
+
+.preview-container blockquote {
+    margin: 1em 0;
+    padding: 0 1em;
+    color: #1976D2;
+    border-left: 0.25em solid #BBDEFB;
+}
+
+.preview-container pre {
+    background-color: #E3F2FD;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 85%;
+    line-height: 1.45;
+}
+
+.preview-container code {
+    background-color: #E3F2FD;
+    border-radius: 3px;
+    padding: 0.2em 0.4em;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 85%;
+}
+
+.preview-container img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 1em auto;
+    border-radius: 4px;
+}
+
+.preview-container table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+
+.preview-container table th,
+.preview-container table td {
+    border: 1px solid #dfe2e5;
+    padding: 6px 13px;
+}
+
+.preview-container table th {
+    background-color: #f6f8fa;
+    font-weight: 600;
+}
+
+.preview-container table tr:nth-child(2n) {
+    background-color: #f6f8fa;
+}
+
+.preview-container a {
+    color: #2196F3;
+    text-decoration: none;
+}
+
+.preview-container a:hover {
+    text-decoration: underline;
+    color: #1976D2;
+}
+
+.preview-toggle {
+    margin-bottom: 10px;
+    color: #2196F3;
+    cursor: pointer;
+    display: inline-block;
+    padding: 6px 12px;
+    border: 1px solid #BBDEFB;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    background-color: #E3F2FD;
+}
+
+.preview-toggle:hover {
+    text-decoration: none;
+    background-color: #BBDEFB;
+}
+
+.preview-toggle i {
+    margin-right: 5px;
+}
+
+/* Markdown 显示样式 */
+.content-title {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+.markdown-body {
+    box-sizing: border-box;
+    min-width: 200px;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    margin-bottom: 20px;
+}
+@media (max-width: 767px) {
+    .markdown-body {
+        padding: 15px;
+    }
+}
+
+/* Markdown 小技巧 */
+.tips {
+    margin-top: 30px;
+    padding: 15px;
+    background-color: #E3F2FD;
+    border-radius: 6px;
+    border-left: 4px solid #2196F3;
+}
+.tips h3 {
+    color: #1976D2;
+    margin-top: 0;
+}
+.tips h3 i {
+    color: #FFB300;
+    margin-right: 6px;
+}
+.tips ul {
+    margin-bottom: 0;
+    padding-left: 20px;
+}
+.tips li {
+    margin-bottom: 5px;
+    color: #333;
+}
+.tips li i {
+    color: #1976D2;
+    width: 20px;
+    margin-right: 5px;
+    text-align: center;
+}
+
+/* 预览错误和空状态提示 */
+.empty-preview, .error-preview {
+    padding: 15px;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.empty-preview {
+    color: #757575;
+    background-color: #f5f5f5;
+}
+
+.error-preview {
+    color: #d32f2f;
+    background-color: #ffebee;
+    border-left: 4px solid #d32f2f;
+}
+
+/* Font Awesome 图标样式 */
+.fa,
+.fas,
+.far,
+.fab {
+    color: #1976D2; /* 使用主题蓝色 */
+    font-size: 1.1em; /* 增加图标大小 */
+}
+
+.button .fa,
+.button .fas,
+.button .far,
+.button .fab {
+    color: white; /* 按钮内的图标使用白色 */
+    margin-right: 5px; /* 图标与文字间的间距 */
+}
+
+/* 根据不同语境设置不同颜色 */
+.content-header .fa,
+.content-header .fas,
+.content-header .far,
+.content-header .fab {
+    color: #455A64; /* 深灰色 */
+}
+
+.content-link .fa,
+.content-link .fas,
+.content-link .far,
+.content-link .fab {
+    color: #2196F3; /* 链接蓝色 */
+}
+
+/* 内容类型图标样式 */
+.type-markdown .fab.fa-markdown {
+    color: #1976D2; /* 蓝色 */
+}
+
+.type-text .fas.fa-file-alt {
+    color: #1976D2; /* 蓝色 */
+}
+
+.type-image .fas.fa-image {
+    color: #1976D2; /* 蓝色 */
+}
+
+/* 时间图标样式 */
+.content-time .fa-clock {
+    color: #9E9E9E; /* 灰色 */
+    margin-right: 4px;
+}
+
+/* 错误消息样式 */
+.error-message {
+    padding: 20px;
+    background-color: #FFEBEE;
+    border-left: 4px solid #E53935;
+    border-radius: 4px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.error-message i {
+    color: #E53935;
+    font-size: 2em;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.error-message p {
+    font-size: 16px;
+    color: #333;
+    margin: 10px 0;
+}
+
+/* 输入组 */
+.input-group {
+    width: 100%;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 5;
+}
+
+.input-label {
+    display: block;
+    margin-bottom: 5px;
+    color: #1976D2;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* 动作按钮组 */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+    margin-bottom: 15px;
+}
+
+.action-buttons .button {
+    flex: 0 0 auto;
 } 

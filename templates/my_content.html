@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>我的分享记录</title>
     <link rel="stylesheet" href="/static/css/styles.css">
+    <!-- 引入Font Awesome图标库 -->
+    <link rel="stylesheet" href="/static/vendor/fontawesome/all.min.css">
 </head>
 <body>
     <div class="container">
@@ -23,7 +25,7 @@
             
             <div class="search-box">
                 <input type="text" id="searchInput" class="search-input" placeholder="搜索标题关键词...">
-                <button id="searchButton" class="search-button">搜索</button>
+                <button id="searchButton" class="search-button"><i class="fas fa-search"></i> 搜索</button>
             </div>
             
             <ul id="contentList" class="content-list">
@@ -42,7 +44,7 @@
         </div>
         
         <div class="back-link">
-            <a href="/">返回首页</a>
+            <a href="/"><i class="fas fa-home"></i> 返回首页</a>
         </div>
     </div>
 
@@ -169,8 +171,22 @@
                     header.className = 'content-header';
                     
                     const typeSpan = document.createElement('span');
-                    typeSpan.className = 'content-type ' + (item.type === 'text' ? 'type-text' : 'type-image');
-                    typeSpan.textContent = item.type === 'text' ? '文本内容' : '图片内容';
+                    let typeClass = 'type-text';
+                    let typeText = '文本内容';
+                    let typeIcon = '<i class="fas fa-file-alt"></i> ';
+                    
+                    if (item.type === 'markdown') {
+                        typeClass = 'type-markdown';
+                        typeText = 'Markdown 内容';
+                        typeIcon = '<i class="fab fa-markdown"></i> ';
+                    } else if (item.type === 'image') {
+                        typeClass = 'type-image';
+                        typeText = '图片内容';
+                        typeIcon = '<i class="fas fa-image"></i> ';
+                    }
+                    
+                    typeSpan.className = 'content-type ' + typeClass;
+                    typeSpan.innerHTML = typeIcon + typeText;
                     
                     const timeSpan = document.createElement('span');
                     timeSpan.className = 'content-time';
@@ -182,7 +198,7 @@
                         hour: '2-digit',
                         minute: '2-digit'
                     };
-                    timeSpan.textContent = createDate.toLocaleString('zh-CN', formatOptions);
+                    timeSpan.innerHTML = '<i class="far fa-clock"></i> ' + createDate.toLocaleString('zh-CN', formatOptions);
                     
                     header.appendChild(typeSpan);
                     header.appendChild(timeSpan);
@@ -194,14 +210,14 @@
                     
                     const idDiv = document.createElement('div');
                     idDiv.className = 'content-id';
-                    idDiv.textContent = `短链接ID: ${item.id}`;
+                    idDiv.innerHTML = '<i class="fas fa-link"></i> 短链接ID: ' + item.id;
                     
                     const linkDiv = document.createElement('div');
                     linkDiv.className = 'content-link';
                     
                     const link = document.createElement('a');
                     link.href = item.link;
-                    link.textContent = '查看内容';
+                    link.innerHTML = '<i class="fas fa-external-link-alt"></i> 查看内容';
                     link.target = '_blank';
                     
                     linkDiv.appendChild(link);

@@ -6,16 +6,9 @@
     <title>SharedSTH - 分享内容</title>
     <link rel="stylesheet" href="/static/css/styles.css">
     <!-- 引入Toastify CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-    <style>
-        .content-title {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid #e0e0e0;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/vendor/toastify/toastify.min.css">
+    <!-- 引入Font Awesome图标库 -->
+    <link rel="stylesheet" href="/static/vendor/fontawesome/all.min.css">
 </head>
 <body>
     <div class="container">
@@ -25,12 +18,14 @@
         {{end}}
         <div class="content-box" id="content">{{.Content}}</div>
         
-        <button class="button copy-button" id="copy-button">复制内容</button>
-        <a href="/" class="button">返回首页</a>
+        <div class="action-buttons">
+            <button class="button copy-button" id="copy-button"><i class="fas fa-copy"></i> 复制内容</button>
+            <a href="/" class="button"><i class="fas fa-home"></i> 返回首页</a>
+        </div>
     </div>
     
     <!-- 引入Toastify JS库 -->
-    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="/static/vendor/toastify/toastify.min.js"></script>
     <!-- 引入公共JS -->
     <script src="/static/js/common.js"></script>
     
