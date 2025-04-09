@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 
@@ -15,12 +16,32 @@ func PublicContentPageHandler(c *gin.Context) {
 
 // PublicContentAPIHandler 获取所有公开内容
 func PublicContentAPIHandler(c *gin.Context) {
-	// 查询所有公开内容
-	results := models.FindPublicContents()
+	// 获取分页参数
+	page := 1
+	if pageParam := c.Query("page"); pageParam != "" {
+		if p, err := strconv.Atoi(pageParam); err == nil && p > 0 {
+			page = p
+		}
+	}
+
+	perPage := 10
+	if perPageParam := c.Query("per_page"); perPageParam != "" {
+		if pp, err := strconv.Atoi(perPageParam); err == nil && pp > 0 {
+			perPage = pp
+		}
+	}
+
+	// 获取搜索参数
+	query := c.Query("query")
+
+	// 获取总记录数和分页数据
+	total, results := models.FindPublicContentsPaginated(query, page, perPage)
 
 	// 返回JSON结果
 	c.JSON(http.StatusOK, gin.H{
-		"count": len(results),
-		"items": results,
+		"total":    total,
+		"page":     page,
+		"per_page": perPage,
+		"items":    results,
 	})
 }

@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 
@@ -20,14 +21,34 @@ func MyContentAPIHandler(c *gin.Context) {
 	// 获取客户端标识
 	clientIdentifier := utils.GetClientIdentifier(c.Request)
 
-	// 查询所有来自该客户端的内容
-	results := models.FindContentsBySource(clientIdentifier)
+	// 获取分页参数
+	page := 1
+	if pageParam := c.Query("page"); pageParam != "" {
+		if p, err := strconv.Atoi(pageParam); err == nil && p > 0 {
+			page = p
+		}
+	}
+
+	perPage := 10
+	if perPageParam := c.Query("per_page"); perPageParam != "" {
+		if pp, err := strconv.Atoi(perPageParam); err == nil && pp > 0 {
+			perPage = pp
+		}
+	}
+
+	// 获取搜索参数
+	query := c.Query("query")
+
+	// 获取总记录数和分页数据
+	total, results := models.FindContentsBySourcePaginated(clientIdentifier, query, page, perPage)
 
 	// 返回JSON结果
 	c.JSON(http.StatusOK, gin.H{
-		"source": clientIdentifier,
-		"count":  len(results),
-		"items":  results,
+		"source":   clientIdentifier,
+		"total":    total,
+		"page":     page,
+		"per_page": perPage,
+		"items":    results,
 	})
 }
 

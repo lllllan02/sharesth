@@ -1,253 +1,460 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>公开内容 - ShareSTH</title>
+    <title>公开分享内容</title>
+    <!-- 先引入Bootstrap CSS -->
+    <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <!-- 后引入自定义CSS，确保能覆盖Bootstrap样式 -->
     <link rel="stylesheet" href="/static/css/styles.css">
-    <!-- 引入Toastify CSS -->
-    <link rel="stylesheet" href="/static/vendor/toastify/toastify.min.css">
     <!-- 引入Font Awesome图标库 -->
     <link rel="stylesheet" href="/static/vendor/fontawesome/all.min.css">
+    <!-- 引入jQuery库 -->
+    <script src="/static/vendor/jquery/jquery.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>公开分享内容 - ShareSTH</h1>
+        <h1>公开分享内容</h1>
         
-        <div class="public-content-header">
-            <p>这里展示的是所有用户公开分享的内容，您可以浏览和搜索这些内容。</p>
+        <div class="filter-controls">
+            <div class="type-filter">
+                <label for="type-filter">内容类型:</label>
+                <select id="type-filter">
+                    <option value="all">全部</option>
+                    <option value="text">文本</option>
+                    <option value="markdown">Markdown</option>
+                    <option value="image">图片</option>
+                </select>
+            </div>
             
-            <!-- 筛选和搜索 -->
-            <div class="filter-controls">
-                <div class="filter-box">
-                    <label class="filter-label">
-                        <i class="fas fa-filter"></i> 按类型筛选:
-                    </label>
-                    <select id="content-type-filter" class="filter-select">
-                        <option value="all">全部</option>
-                        <option value="markdown">Markdown</option>
-                        <option value="text">文本</option>
-                        <option value="image">图片</option>
-                    </select>
-                </div>
-                
-                <div class="search-box">
-                    <input type="text" id="content-search" class="search-input" placeholder="搜索标题...">
-                    <button id="search-button" class="search-button"><i class="fas fa-search"></i> 搜索</button>
-                </div>
+            <div class="search-box">
+                <input type="text" id="searchInput" class="search-input" placeholder="搜索标题关键词...">
+                <button id="searchButton" class="search-button"><i class="fas fa-search"></i> 搜索</button>
             </div>
         </div>
         
-        <!-- 加载提示 -->
         <div id="loading" class="loading">
             <div class="spinner"></div>
-            <p>正在加载内容...</p>
+            <p>正在加载数据...</p>
         </div>
         
-        <!-- 内容列表 -->
-        <div id="content-container" class="content-container" style="display:none;">
-            <div class="content-stats">
-                <p>共找到 <span id="content-count">0</span> 项公开内容</p>
-            </div>
-            
-            <ul id="content-list" class="content-list">
-                <!-- 内容将通过 JavaScript 动态生成 -->
-            </ul>
-            
-            <!-- 无内容提示 -->
-            <div id="no-content" class="no-content" style="display:none;">
-                <i class="fas fa-info-circle"></i>
-                <p>当前没有公开的内容。</p>
-            </div>
-            
-            <!-- 无搜索结果提示 -->
-            <div id="no-filter-results" class="no-search-result hidden">
-                <i class="fas fa-search"></i>
-                <p>没有找到符合条件的内容</p>
-            </div>
+        <div id="content-list" class="content-list" style="display: none;"></div>
+        
+        <!-- 分页控件容器 -->
+        <div id="pagination-container" class="pagination-container" style="display: none;"></div>
+        
+        <div id="no-content" class="no-content" style="display: none;">
+            <p>暂无公开分享内容</p>
         </div>
         
-        <div class="footer">
+        <div id="no-search-result" class="no-content" style="display: none;">
+            <p>没有找到匹配的内容</p>
+            <p>尝试其他关键词或清除搜索条件</p>
+        </div>
+        
+        <div class="back-link">
             <a href="/"><i class="fas fa-home"></i> 返回首页</a>
-            <a href="/my-content"><i class="fas fa-list"></i> 我的分享</a>
-            <a href="/search"><i class="fas fa-search"></i> 查询用户分享</a>
         </div>
     </div>
-    
-    <!-- 引入Toastify JS -->
-    <script src="/static/vendor/toastify/toastify.min.js"></script>
-    <!-- 引入公共JS -->
-    <script src="/static/js/common.js"></script>
-    
+
     <script>
-        // 页面加载完成后获取公开内容
-        document.addEventListener('DOMContentLoaded', fetchPublicContent);
+        // 存储当前页面状态
+        let currentPage = 1;
+        let pageSize = 10;
+        let totalItems = 0;
+        let currentType = 'all';
+        let searchTerm = '';
         
-        // 筛选逻辑
-        document.getElementById('content-type-filter').addEventListener('change', filterContent);
-        document.getElementById('content-search').addEventListener('input', debounce(filterContent, 300));
-        document.getElementById('search-button').addEventListener('click', filterContent);
-        
-        // 获取所有公开内容
-        function fetchPublicContent() {
-            fetch('/api/public-content', {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json'
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('获取数据失败');
-                }
-                return response.json();
-            })
-            .then(data => {
-                // 隐藏加载中提示
-                document.getElementById('loading').style.display = 'none';
-                // 显示内容容器
-                document.getElementById('content-container').style.display = 'block';
-                
-                // 存储数据供筛选使用
-                window.allPublicItems = data.items || [];
-                
-                // 显示内容
-                displayContent(data);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('loading').innerHTML = `
-                    <p>获取数据失败: ${error.message}</p>
-                    <p>请刷新页面重试</p>
-                `;
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始加载内容
+            fetchPublicContent(currentPage);
+            
+            // 设置类型筛选器事件监听
+            document.getElementById('type-filter').addEventListener('change', function() {
+                currentType = this.value;
+                currentPage = 1; // 重置为第一页
+                fetchPublicContent(currentPage);
             });
+            
+            // 设置搜索按钮事件监听
+            document.getElementById('searchButton').addEventListener('click', function() {
+                const newSearchTerm = document.getElementById('searchInput').value.trim();
+                if (newSearchTerm !== searchTerm) {
+                    searchTerm = newSearchTerm;
+                    currentPage = 1; // 重置为第一页
+                    fetchPublicContent(currentPage);
+                }
+            });
+            
+            // 设置搜索输入框回车事件
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const newSearchTerm = this.value.trim();
+                    if (newSearchTerm !== searchTerm) {
+                        searchTerm = newSearchTerm;
+                        currentPage = 1; // 重置为第一页
+                        fetchPublicContent(currentPage);
+                    }
+                }
+            });
+        });
+        
+        // 获取公开内容
+        function fetchPublicContent(page) {
+            // 显示加载中
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('content-list').style.display = 'none';
+            document.getElementById('pagination-container').style.display = 'none';
+            document.getElementById('no-content').style.display = 'none';
+            document.getElementById('no-search-result').style.display = 'none';
+            
+            // 构建查询参数
+            const params = new URLSearchParams();
+            params.append('page', page);
+            params.append('per_page', pageSize);
+            
+            // 添加类型过滤
+            if (currentType !== 'all') {
+                params.append('type', currentType);
+            }
+            
+            // 添加搜索条件
+            if (searchTerm) {
+                params.append('query', searchTerm);
+            }
+            
+            // 发送请求
+            fetch(`/api/public-content?${params.toString()}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('获取数据失败');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // 隐藏加载中
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    // 更新页面状态
+                    currentPage = data.page || 1;
+                    totalItems = data.total || 0;
+                    pageSize = data.per_page || 10;
+                    
+                    // 处理内容渲染
+                    displayContent(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('loading').innerHTML = `
+                        <p>加载失败: ${error.message}</p>
+                        <p>请刷新页面重试</p>
+                    `;
+                });
         }
         
         // 显示内容
         function displayContent(data) {
-            const contentCountEl = document.getElementById('content-count');
+            const contentList = document.getElementById('content-list');
             
-            // 更新内容计数
-            contentCountEl.textContent = data.count;
-            
-            // 显示内容列表
-            if (data.count > 0) {
-                // 按时间逆序排序内容
-                window.allPublicItems.sort((a, b) => {
-                    return new Date(b.createTime) - new Date(a.createTime);
-                });
-                
-                // 显示所有内容
-                displayFilteredContent(window.allPublicItems);
-            } else {
-                // 无内容
-                document.getElementById('content-list').style.display = 'none';
-                document.getElementById('no-content').style.display = 'block';
-            }
-        }
-        
-        // 筛选内容
-        function filterContent() {
-            const typeFilter = document.getElementById('content-type-filter').value;
-            const searchText = document.getElementById('content-search').value.trim().toLowerCase();
-            
-            if (!window.allPublicItems || window.allPublicItems.length === 0) {
+            // 处理无内容情况
+            if (data.total === 0) {
+                // 显示无内容提示
+                if (searchTerm || currentType !== 'all') {
+                    // 有搜索条件但无结果
+                    document.getElementById('no-search-result').style.display = 'block';
+                } else {
+                    // 无任何内容
+                    document.getElementById('no-content').style.display = 'block';
+                }
                 return;
             }
             
-            // 应用筛选
-            let filteredItems = window.allPublicItems;
+            // 有内容，清空并显示内容列表
+            contentList.innerHTML = '';
+            contentList.style.display = 'block';
             
-            // 按类型筛选
-            if (typeFilter !== 'all') {
-                filteredItems = filteredItems.filter(item => item.type === typeFilter);
-            }
+            // 渲染内容项
+            data.items.forEach(item => {
+                const contentItem = createContentItem(item);
+                contentList.appendChild(contentItem);
+            });
             
-            // 按搜索文本筛选
-            if (searchText) {
-                filteredItems = filteredItems.filter(item => 
-                    item.title.toLowerCase().includes(searchText)
-                );
-            }
-            
-            // 显示筛选结果
-            displayFilteredContent(filteredItems);
+            // 更新分页
+            updatePagination(data);
         }
         
-        // 显示筛选后的内容
-        function displayFilteredContent(items) {
-            const contentListEl = document.getElementById('content-list');
-            const noContentEl = document.getElementById('no-content');
-            const noFilterResultsEl = document.getElementById('no-filter-results');
+        // 创建内容项元素
+        function createContentItem(item) {
+            const contentItem = document.createElement('div');
+            contentItem.className = 'content-item';
             
-            // 清空内容列表
-            contentListEl.innerHTML = '';
+            // 创建头部信息
+            const header = document.createElement('div');
+            header.className = 'content-header';
             
-            if (items.length > 0) {
-                // 有结果，显示内容列表
-                noContentEl.style.display = 'none';
-                contentListEl.style.display = 'block';
-                noFilterResultsEl.classList.add('hidden');
-                
-                // 添加内容项
-                items.forEach(item => {
-                    const li = document.createElement('li');
-                    li.className = 'content-item';
-                    
-                    const header = document.createElement('div');
-                    header.className = 'content-header';
-                    
-                    const typeSpan = document.createElement('span');
-                    let typeClass = 'type-text';
-                    let typeText = '文本内容';
-                    let typeIcon = '<i class="fas fa-file-alt"></i> ';
-                    
-                    if (item.type === 'markdown') {
-                        typeClass = 'type-markdown';
-                        typeText = 'Markdown 内容';
-                        typeIcon = '<i class="fab fa-markdown"></i> ';
-                    } else if (item.type === 'image') {
-                        typeClass = 'type-image';
-                        typeText = '图片内容';
-                        typeIcon = '<i class="fas fa-image"></i> ';
-                    }
-                    
-                    typeSpan.className = 'content-type ' + typeClass;
-                    typeSpan.innerHTML = typeIcon + typeText;
-                    
-                    const timeSpan = document.createElement('span');
-                    timeSpan.className = 'content-time';
-                    const createDate = new Date(item.createTime);
-                    timeSpan.innerHTML = '<i class="far fa-clock"></i> ' + createDate.toLocaleString();
-                    
-                    header.appendChild(typeSpan);
-                    header.appendChild(timeSpan);
-                    
-                    const title = document.createElement('h3');
-                    title.className = 'content-title';
-                    title.textContent = item.title || '无标题';
-                    
-                    const link = document.createElement('div');
-                    link.className = 'content-link';
-                    link.innerHTML = `<a href="${item.link}" target="_blank"><i class="fas fa-external-link-alt"></i> 查看内容</a>`;
-                    
-                    li.appendChild(header);
-                    li.appendChild(title);
-                    li.appendChild(link);
-                    
-                    contentListEl.appendChild(li);
-                });
-            } else if (document.getElementById('content-search').value.trim() || document.getElementById('content-type-filter').value !== 'all') {
-                // 筛选后无结果
-                contentListEl.style.display = 'none';
-                noContentEl.style.display = 'none';
-                noFilterResultsEl.classList.remove('hidden');
-            } else {
-                // 根本没有内容
-                contentListEl.style.display = 'none';
-                noContentEl.style.display = 'block';
-                noFilterResultsEl.classList.add('hidden');
+            // 内容类型标签
+            const typeSpan = document.createElement('span');
+            let typeClass = 'type-text';
+            let typeText = '文本内容';
+            let typeIcon = '<i class="fas fa-file-alt"></i> ';
+            
+            if (item.type === 'markdown') {
+                typeClass = 'type-markdown';
+                typeText = 'Markdown 内容';
+                typeIcon = '<i class="fab fa-markdown"></i> ';
+            } else if (item.type === 'image') {
+                typeClass = 'type-image';
+                typeText = '图片内容';
+                typeIcon = '<i class="fas fa-image"></i> ';
             }
+            
+            typeSpan.className = 'content-type ' + typeClass;
+            typeSpan.innerHTML = typeIcon + typeText;
+            
+            // 创建时间标签
+            const timeSpan = document.createElement('span');
+            timeSpan.className = 'content-time';
+            const createDate = new Date(item.createTime);
+            const formatOptions = { 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            timeSpan.innerHTML = '<i class="far fa-clock"></i> ' + createDate.toLocaleString('zh-CN', formatOptions);
+            
+            header.appendChild(typeSpan);
+            header.appendChild(timeSpan);
+            
+            // 内容标题
+            const title = document.createElement('h3');
+            title.className = 'content-title';
+            title.textContent = item.title || '无标题';
+            
+            // 内容操作区
+            const actions = document.createElement('div');
+            actions.className = 'content-actions';
+            
+            // 添加查看链接
+            const linkDiv = document.createElement('div');
+            linkDiv.className = 'content-link';
+            linkDiv.innerHTML = `<a href="${item.link}" target="_blank"><i class="fas fa-external-link-alt"></i> 查看内容</a>`;
+            
+            actions.appendChild(linkDiv);
+            
+            // 组装内容项
+            contentItem.appendChild(header);
+            contentItem.appendChild(title);
+            contentItem.appendChild(actions);
+            
+            return contentItem;
+        }
+        
+        // 更新分页控件
+        function updatePagination(data) {
+            const paginationContainer = document.getElementById('pagination-container');
+            
+            // 有内容时显示分页
+            if (data.total > 0) {
+                paginationContainer.style.display = 'block';
+                
+                // 清空分页容器
+                paginationContainer.innerHTML = '';
+                
+                // 计算分页信息
+                const totalPages = Math.ceil(data.total / pageSize);
+                const currentItems = data.items.length;
+                const startItem = (currentPage - 1) * pageSize + 1;
+                const endItem = startItem + currentItems - 1;
+                
+                // 创建分页信息
+                const paginationInfo = document.createElement('div');
+                paginationInfo.className = 'pagination-info';
+                paginationInfo.textContent = `显示 ${startItem}-${endItem} 条，共 ${data.total} 条记录`;
+                
+                // 创建包装器将分页和跳转放到同一行
+                const paginationWrapper = document.createElement('div');
+                paginationWrapper.className = 'pagination-wrapper';
+                
+                // 创建分页列表
+                const paginationUl = document.createElement('ul');
+                paginationUl.className = 'pagination';
+                
+                // 创建分页跳转
+                const jumpDiv = document.createElement('div');
+                jumpDiv.className = 'pagination-jump';
+                jumpDiv.innerHTML = `
+                    <span>跳至</span>
+                    <input type="number" min="1" max="${totalPages}" id="pageJumpInput">
+                    <span>页</span>
+                    <button id="pageJumpBtn">确定</button>
+                `;
+                
+                // 添加到容器
+                paginationContainer.appendChild(paginationInfo);
+                paginationWrapper.appendChild(paginationUl);
+                paginationWrapper.appendChild(jumpDiv);
+                paginationContainer.appendChild(paginationWrapper);
+                
+                // 渲染分页按钮
+                renderPaginationButtons(paginationUl, totalPages);
+                
+                // 添加跳转事件
+                document.getElementById('pageJumpBtn').addEventListener('click', function() {
+                    const pageInput = document.getElementById('pageJumpInput');
+                    const targetPage = parseInt(pageInput.value);
+                    
+                    if (targetPage && targetPage >= 1 && targetPage <= totalPages) {
+                        currentPage = targetPage;
+                        fetchPublicContent(currentPage);
+                    } else {
+                        showToast('请输入有效的页码');
+                    }
+                });
+            } else {
+                paginationContainer.style.display = 'none';
+            }
+        }
+        
+        // 渲染分页按钮
+        function renderPaginationButtons(paginationUl, totalPages) {
+            // 上一页
+            const prevLi = document.createElement('li');
+            prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+            const prevLink = document.createElement('a');
+            prevLink.className = 'page-link';
+            prevLink.href = 'javascript:void(0)';
+            prevLink.innerHTML = '&laquo;';
+            prevLink.setAttribute('aria-label', '上一页');
+            
+            if (currentPage > 1) {
+                prevLink.addEventListener('click', function() {
+                    fetchPublicContent(currentPage - 1);
+                });
+            }
+            prevLi.appendChild(prevLink);
+            paginationUl.appendChild(prevLi);
+            
+            // 页码
+            const maxVisiblePages = 5; // 最多显示几个页码
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+            
+            // 第一页和省略号
+            if (startPage > 1) {
+                const firstLi = document.createElement('li');
+                firstLi.className = 'page-item';
+                const firstLink = document.createElement('a');
+                firstLink.className = 'page-link';
+                firstLink.href = 'javascript:void(0)';
+                firstLink.textContent = '1';
+                firstLink.addEventListener('click', function() {
+                    fetchPublicContent(1);
+                });
+                firstLi.appendChild(firstLink);
+                paginationUl.appendChild(firstLi);
+                
+                if (startPage > 2) {
+                    const ellipsisLi = document.createElement('li');
+                    ellipsisLi.className = 'page-item disabled';
+                    const ellipsisLink = document.createElement('a');
+                    ellipsisLink.className = 'page-link';
+                    ellipsisLink.href = 'javascript:void(0)';
+                    ellipsisLink.textContent = '...';
+                    ellipsisLi.appendChild(ellipsisLink);
+                    paginationUl.appendChild(ellipsisLi);
+                }
+            }
+            
+            // 显示页码
+            for (let i = startPage; i <= endPage; i++) {
+                const pageLi = document.createElement('li');
+                pageLi.className = `page-item ${currentPage === i ? 'active' : ''}`;
+                const pageLink = document.createElement('a');
+                pageLink.className = 'page-link';
+                pageLink.href = 'javascript:void(0)';
+                pageLink.textContent = i;
+                
+                if (currentPage !== i) {
+                    pageLink.addEventListener('click', function() {
+                        fetchPublicContent(i);
+                    });
+                }
+                
+                pageLi.appendChild(pageLink);
+                paginationUl.appendChild(pageLi);
+            }
+            
+            // 省略号和最后一页
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    const ellipsisLi = document.createElement('li');
+                    ellipsisLi.className = 'page-item disabled';
+                    const ellipsisLink = document.createElement('a');
+                    ellipsisLink.className = 'page-link';
+                    ellipsisLink.href = 'javascript:void(0)';
+                    ellipsisLink.textContent = '...';
+                    ellipsisLi.appendChild(ellipsisLink);
+                    paginationUl.appendChild(ellipsisLi);
+                }
+                
+                const lastLi = document.createElement('li');
+                lastLi.className = 'page-item';
+                const lastLink = document.createElement('a');
+                lastLink.className = 'page-link';
+                lastLink.href = 'javascript:void(0)';
+                lastLink.textContent = totalPages;
+                lastLink.addEventListener('click', function() {
+                    fetchPublicContent(totalPages);
+                });
+                lastLi.appendChild(lastLink);
+                paginationUl.appendChild(lastLi);
+            }
+            
+            // 下一页
+            const nextLi = document.createElement('li');
+            nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+            const nextLink = document.createElement('a');
+            nextLink.className = 'page-link';
+            nextLink.href = 'javascript:void(0)';
+            nextLink.innerHTML = '&raquo;';
+            nextLink.setAttribute('aria-label', '下一页');
+            
+            if (currentPage < totalPages) {
+                nextLink.addEventListener('click', function() {
+                    fetchPublicContent(currentPage + 1);
+                });
+            }
+            
+            nextLi.appendChild(nextLink);
+            paginationUl.appendChild(nextLi);
+        }
+        
+        // 显示提示消息
+        function showToast(message) {
+            // 检查是否已有Toast元素
+            let toast = document.querySelector('.toast-message');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.className = 'toast-message';
+                document.body.appendChild(toast);
+            }
+            
+            // 设置消息并显示
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
         }
     </script>
 </body>

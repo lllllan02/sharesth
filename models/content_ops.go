@@ -69,3 +69,72 @@ func FindPublicContents() []map[string]interface{} {
 
 	return results
 }
+
+// FindContentsBySourcePaginated 分页查找指定来源的内容，支持标题搜索
+func FindContentsBySourcePaginated(source string, query string, page int, perPage int) (int64, []map[string]interface{}) {
+	var contents []Content
+	db := DB.Where("source = ?", source)
+
+	// 如果提供了搜索查询，添加标题搜索条件
+	if query != "" {
+		db = db.Where("title LIKE ?", "%"+query+"%")
+	}
+
+	// 计算总记录数
+	var total int64
+	db.Model(&Content{}).Count(&total)
+
+	// 分页查询
+	offset := (page - 1) * perPage
+	db.Order("create_time DESC").Offset(offset).Limit(perPage).Find(&contents)
+
+	// 格式化结果
+	var results []map[string]interface{}
+	for _, content := range contents {
+		results = append(results, map[string]interface{}{
+			"id":         content.ID,
+			"short_id":   content.ShortID,
+			"type":       content.Type,
+			"createTime": content.CreateTime,
+			"link":       "/" + content.ShortID,
+			"title":      content.Title,
+			"is_public":  content.IsPublic,
+		})
+	}
+
+	return total, results
+}
+
+// FindPublicContentsPaginated 分页查找公开的内容，支持标题搜索
+func FindPublicContentsPaginated(query string, page int, perPage int) (int64, []map[string]interface{}) {
+	var contents []Content
+	db := DB.Where("is_public = ?", true)
+
+	// 如果提供了搜索查询，添加标题搜索条件
+	if query != "" {
+		db = db.Where("title LIKE ?", "%"+query+"%")
+	}
+
+	// 计算总记录数
+	var total int64
+	db.Model(&Content{}).Count(&total)
+
+	// 分页查询
+	offset := (page - 1) * perPage
+	db.Order("create_time DESC").Offset(offset).Limit(perPage).Find(&contents)
+
+	// 格式化结果
+	var results []map[string]interface{}
+	for _, content := range contents {
+		results = append(results, map[string]interface{}{
+			"id":         content.ID,
+			"short_id":   content.ShortID,
+			"type":       content.Type,
+			"createTime": content.CreateTime,
+			"link":       "/" + content.ShortID,
+			"title":      content.Title,
+		})
+	}
+
+	return total, results
+}
