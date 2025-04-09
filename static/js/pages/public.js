@@ -98,16 +98,23 @@ function fetchPublicContent(page) {
 // 显示内容
 function displayContent(data) {
     const contentList = document.getElementById('content-list');
+    const paginationContainer = document.getElementById('pagination-container');
     
     // 处理无内容情况
     if (data.total === 0) {
+        // 隐藏内容列表和分页
+        contentList.style.display = 'none';
+        paginationContainer.style.display = 'none';
+        
         // 显示无内容提示
         if (searchTerm || currentType !== 'all') {
             // 有搜索条件但无结果
             document.getElementById('no-search-result').style.display = 'block';
+            document.getElementById('no-content').style.display = 'none';
         } else {
             // 无任何内容
             document.getElementById('no-content').style.display = 'block';
+            document.getElementById('no-search-result').style.display = 'none';
         }
         return;
     }
@@ -115,6 +122,10 @@ function displayContent(data) {
     // 有内容，清空并显示内容列表
     contentList.innerHTML = '';
     contentList.style.display = 'block';
+    
+    // 隐藏无内容提示
+    document.getElementById('no-content').style.display = 'none';
+    document.getElementById('no-search-result').style.display = 'none';
     
     // 渲染内容项
     data.items.forEach(item => {

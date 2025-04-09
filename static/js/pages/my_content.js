@@ -137,185 +137,139 @@ function displayContent(data) {
 function initPagination(data) {
     const paginationContainer = document.getElementById('pagination-container');
     
-    if (totalItems > 0) {
-        // 有结果，显示分页
-        paginationContainer.style.display = 'block';
-        
-        // 清空分页容器
-        paginationContainer.innerHTML = '';
-        
-        // 计算分页信息
-        const totalPages = Math.ceil(totalItems / pageSize);
-        const currentItems = data.items.length;
-        const startItem = (currentPage - 1) * pageSize + 1;
-        const endItem = startItem + currentItems - 1;
-        
-        // 创建分页信息
-        const paginationInfo = document.createElement('div');
-        paginationInfo.className = 'pagination-info';
-        paginationInfo.textContent = `显示 ${startItem}-${endItem} 条，共 ${totalItems} 条记录`;
-        
-        // 创建包装器将分页和跳转放到同一行
-        const paginationWrapper = document.createElement('div');
-        paginationWrapper.className = 'pagination-wrapper';
-        
-        // 创建分页列表
-        const paginationUl = document.createElement('ul');
-        paginationUl.className = 'pagination';
-        
-        // 创建分页跳转
-        const jumpDiv = document.createElement('div');
-        jumpDiv.className = 'pagination-jump';
-        jumpDiv.innerHTML = `
-            <span>跳至</span>
-            <input type="number" min="1" max="${totalPages}" id="pageJumpInput">
-            <span>页</span>
-            <button id="pageJumpBtn">确定</button>
-        `;
-        
-        // 添加到容器
-        paginationContainer.appendChild(paginationInfo);
-        paginationWrapper.appendChild(paginationUl);
-        paginationWrapper.appendChild(jumpDiv);
-        paginationContainer.appendChild(paginationWrapper);
-        
-        // 渲染分页按钮
-        renderPaginationButtons(paginationUl, totalPages);
-        
-        // 添加跳转事件
-        document.getElementById('pageJumpBtn').addEventListener('click', function() {
-            const pageInput = document.getElementById('pageJumpInput');
-            const targetPage = parseInt(pageInput.value);
-            
-            if (targetPage && targetPage >= 1 && targetPage <= totalPages) {
-                currentPage = targetPage;
-                fetchContentPage(currentPage);
-            } else {
-                showToast('请输入有效的页码');
-            }
-        });
-    } else {
-        // 无内容
+    if (totalItems === 0) {
         paginationContainer.style.display = 'none';
+        return;
     }
-}
-
-// 渲染分页按钮
-function renderPaginationButtons(paginationUl, totalPages) {
-    // 上一页
-    const prevLi = document.createElement('li');
-    prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
-    const prevLink = document.createElement('a');
-    prevLink.className = 'page-link';
-    prevLink.href = 'javascript:void(0)';
-    prevLink.innerHTML = '&laquo;';
-    prevLink.setAttribute('aria-label', '上一页');
     
+    // 有结果，显示分页
+    paginationContainer.style.display = 'block';
+    paginationContainer.innerHTML = '';
+    
+    // 计算分页信息
+    const totalPages = Math.ceil(totalItems / pageSize);
+    
+    // 添加分页信息
+    const paginationInfo = document.createElement('div');
+    paginationInfo.className = 'pagination-info';
+    const startItem = (currentPage - 1) * pageSize + 1;
+    const endItem = Math.min(startItem + pageSize - 1, totalItems);
+    paginationInfo.textContent = `显示 ${startItem}-${endItem} 条，共 ${totalItems} 条记录`;
+    paginationContainer.appendChild(paginationInfo);
+    
+    // 创建分页控件容器
+    const paginationControls = document.createElement('div');
+    paginationControls.className = 'pagination-controls';
+    
+    // 创建分页按钮组
+    const buttonGroup = document.createElement('div');
+    buttonGroup.className = 'pagination-buttons';
+    
+    // 上一页按钮
     if (currentPage > 1) {
-        prevLink.addEventListener('click', function() {
-            fetchContentPage(currentPage - 1);
-        });
-    }
-    prevLi.appendChild(prevLink);
-    paginationUl.appendChild(prevLi);
-    
-    // 页码
-    const maxVisiblePages = 5; // 最多显示几个页码
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-    
-    if (endPage - startPage + 1 < maxVisiblePages) {
-        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        const prevButton = document.createElement('button');
+        prevButton.className = 'pagination-button';
+        prevButton.innerHTML = '<i class="fas fa-chevron-left"></i> 上一页';
+        prevButton.addEventListener('click', () => fetchContentPage(currentPage - 1));
+        buttonGroup.appendChild(prevButton);
     }
     
-    // 第一页和省略号
+    // 页码按钮
+    const maxPages = 5; // 最多显示的页码数
+    const startPage = Math.max(1, currentPage - Math.floor(maxPages / 2));
+    const endPage = Math.min(totalPages, startPage + maxPages - 1);
+    
+    // 第一页
     if (startPage > 1) {
-        const firstLi = document.createElement('li');
-        firstLi.className = 'page-item';
-        const firstLink = document.createElement('a');
-        firstLink.className = 'page-link';
-        firstLink.href = 'javascript:void(0)';
-        firstLink.textContent = '1';
-        firstLink.addEventListener('click', function() {
-            fetchContentPage(1);
-        });
-        firstLi.appendChild(firstLink);
-        paginationUl.appendChild(firstLi);
+        const firstButton = document.createElement('button');
+        firstButton.className = 'pagination-button';
+        firstButton.textContent = '1';
+        firstButton.addEventListener('click', () => fetchContentPage(1));
+        buttonGroup.appendChild(firstButton);
         
+        // 如果不连续，添加省略号
         if (startPage > 2) {
-            const ellipsisLi = document.createElement('li');
-            ellipsisLi.className = 'page-item disabled';
-            const ellipsisLink = document.createElement('a');
-            ellipsisLink.className = 'page-link';
-            ellipsisLink.href = 'javascript:void(0)';
-            ellipsisLink.textContent = '...';
-            ellipsisLi.appendChild(ellipsisLink);
-            paginationUl.appendChild(ellipsisLi);
+            const ellipsis = document.createElement('span');
+            ellipsis.className = 'pagination-ellipsis';
+            ellipsis.textContent = '...';
+            buttonGroup.appendChild(ellipsis);
         }
     }
     
-    // 显示页码
+    // 中间页码
     for (let i = startPage; i <= endPage; i++) {
-        const pageLi = document.createElement('li');
-        pageLi.className = `page-item ${currentPage === i ? 'active' : ''}`;
-        const pageLink = document.createElement('a');
-        pageLink.className = 'page-link';
-        pageLink.href = 'javascript:void(0)';
-        pageLink.textContent = i;
+        const pageButton = document.createElement('button');
+        pageButton.className = i === currentPage ? 'pagination-button active' : 'pagination-button';
+        pageButton.textContent = i;
         
-        if (currentPage !== i) {
-            pageLink.addEventListener('click', function() {
-                fetchContentPage(i);
-            });
+        if (i !== currentPage) {
+            pageButton.addEventListener('click', () => fetchContentPage(i));
         }
         
-        pageLi.appendChild(pageLink);
-        paginationUl.appendChild(pageLi);
+        buttonGroup.appendChild(pageButton);
     }
     
-    // 省略号和最后一页
+    // 最后一页
     if (endPage < totalPages) {
+        // 如果不连续，添加省略号
         if (endPage < totalPages - 1) {
-            const ellipsisLi = document.createElement('li');
-            ellipsisLi.className = 'page-item disabled';
-            const ellipsisLink = document.createElement('a');
-            ellipsisLink.className = 'page-link';
-            ellipsisLink.href = 'javascript:void(0)';
-            ellipsisLink.textContent = '...';
-            ellipsisLi.appendChild(ellipsisLink);
-            paginationUl.appendChild(ellipsisLi);
+            const ellipsis = document.createElement('span');
+            ellipsis.className = 'pagination-ellipsis';
+            ellipsis.textContent = '...';
+            buttonGroup.appendChild(ellipsis);
         }
         
-        const lastLi = document.createElement('li');
-        lastLi.className = 'page-item';
-        const lastLink = document.createElement('a');
-        lastLink.className = 'page-link';
-        lastLink.href = 'javascript:void(0)';
-        lastLink.textContent = totalPages;
-        lastLink.addEventListener('click', function() {
-            fetchContentPage(totalPages);
-        });
-        lastLi.appendChild(lastLink);
-        paginationUl.appendChild(lastLi);
+        const lastButton = document.createElement('button');
+        lastButton.className = 'pagination-button';
+        lastButton.textContent = totalPages;
+        lastButton.addEventListener('click', () => fetchContentPage(totalPages));
+        buttonGroup.appendChild(lastButton);
     }
     
-    // 下一页
-    const nextLi = document.createElement('li');
-    nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
-    const nextLink = document.createElement('a');
-    nextLink.className = 'page-link';
-    nextLink.href = 'javascript:void(0)';
-    nextLink.innerHTML = '&raquo;';
-    nextLink.setAttribute('aria-label', '下一页');
-    
+    // 下一页按钮
     if (currentPage < totalPages) {
-        nextLink.addEventListener('click', function() {
-            fetchContentPage(currentPage + 1);
-        });
+        const nextButton = document.createElement('button');
+        nextButton.className = 'pagination-button';
+        nextButton.innerHTML = '下一页 <i class="fas fa-chevron-right"></i>';
+        nextButton.addEventListener('click', () => fetchContentPage(currentPage + 1));
+        buttonGroup.appendChild(nextButton);
     }
     
-    nextLi.appendChild(nextLink);
-    paginationUl.appendChild(nextLi);
+    paginationControls.appendChild(buttonGroup);
+    
+    // 添加页码跳转
+    const pageJump = document.createElement('div');
+    pageJump.className = 'page-jump';
+    pageJump.innerHTML = `
+        <span>跳至</span>
+        <input type="number" id="pageInput" min="1" max="${totalPages}" value="${currentPage}">
+        <span>页</span>
+        <button id="jumpButton">确定</button>
+    `;
+    paginationControls.appendChild(pageJump);
+    
+    // 添加到分页容器
+    paginationContainer.appendChild(paginationControls);
+    
+    // 添加跳转事件
+    document.getElementById('jumpButton').addEventListener('click', function() {
+        const pageInput = document.getElementById('pageInput');
+        const page = parseInt(pageInput.value, 10);
+        
+        if (page >= 1 && page <= totalPages) {
+            fetchContentPage(page);
+        } else {
+            showToast('请输入有效的页码');
+            pageInput.value = currentPage;
+        }
+    });
+    
+    // 添加回车事件
+    document.getElementById('pageInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            document.getElementById('jumpButton').click();
+        }
+    });
 }
 
 // 渲染内容列表

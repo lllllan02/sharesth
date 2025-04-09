@@ -1131,40 +1131,119 @@ button:hover, .button:hover, .search-button:hover {
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-top: 20px;
+    margin-bottom: 30px;
 }
 .pagination-info {
     margin-bottom: 10px;
     color: #666;
 }
-.pagination-wrapper {
+.pagination-controls {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: 15px;
 }
-.pagination-jump {
+
+/* 分页按钮样式 */
+.pagination-buttons {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.pagination-button {
+    padding: 8px 12px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #333;
+    cursor: pointer;
+    font-size: 14px;
+    min-width: 40px;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.pagination-button:hover {
+    background-color: #f5f5f5;
+    border-color: #ccc;
+}
+
+.pagination-button.active {
+    background-color: #2196F3;
+    border-color: #2196F3;
+    color: #fff;
+    cursor: default;
+}
+
+.pagination-button.active:hover {
+    background-color: #1976D2;
+}
+
+.pagination-ellipsis {
+    padding: 8px 12px;
+    color: #777;
+    font-size: 14px;
+}
+
+/* 页码跳转区域样式 */
+.page-jump {
     display: flex;
     align-items: center;
+    gap: 6px;
+    margin-left: 10px;
 }
-.pagination-jump input {
+
+.page-jump input {
     width: 50px;
-    margin: 0 10px;
-    padding: 4px 8px;
-    border: 1px solid #ced4da;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
     border-radius: 4px;
     text-align: center;
 }
-.pagination-jump button {
+
+.page-jump button {
+    padding: 6px 10px;
     background-color: #2196F3;
     color: white;
     border: none;
     border-radius: 4px;
-    padding: 5px 15px;
     cursor: pointer;
+    transition: background-color 0.2s;
 }
-.pagination-jump button:hover {
+
+.page-jump button:hover {
     background-color: #1976D2;
+}
+
+/* 移动设备适配 */
+@media (max-width: 768px) {
+    .pagination-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .pagination-buttons {
+        margin-bottom: 10px;
+    }
+    
+    .page-jump {
+        margin-left: 0;
+        justify-content: center;
+    }
+    
+    .pagination-button {
+        padding: 6px 10px;
+        min-width: 36px;
+    }
+}
+
+.pagination-jump {
+    display: flex;
+    align-items: center;
 }
 
 /* ===== 从my_content.html提取的样式 ===== */
