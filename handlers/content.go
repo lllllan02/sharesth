@@ -94,3 +94,29 @@ func ToggleContentVisibilityHandler(c *gin.Context) {
 		}()),
 	})
 }
+
+// DeleteContentHandler 处理删除内容的请求
+func DeleteContentHandler(c *gin.Context) {
+	// 获取客户端标识
+	clientIdentifier := utils.GetClientIdentifier(c.Request)
+
+	// 获取内容ID
+	contentID := c.PostForm("content_id")
+	if contentID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "未提供内容ID"})
+		return
+	}
+
+	// 删除内容
+	err := models.DeleteContent(contentID, clientIdentifier)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	// 返回成功信息
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "内容已成功删除",
+	})
+}

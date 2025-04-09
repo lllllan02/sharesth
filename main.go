@@ -37,6 +37,7 @@ func main() {
 	r.GET("/my-content", handlers.MyContentPageHandler)
 	r.GET("/api/my-content", handlers.MyContentAPIHandler)
 	r.POST("/api/toggle-visibility", handlers.ToggleContentVisibilityHandler)
+	r.POST("/api/delete-content", handlers.DeleteContentHandler)
 	r.GET("/search", handlers.SourceSearchPageHandler)
 	r.GET("/api/source-content", handlers.SourceContentHandler)
 	r.GET("/public", handlers.PublicContentPageHandler)

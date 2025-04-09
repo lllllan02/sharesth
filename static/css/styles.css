@@ -555,13 +555,38 @@ button:hover, .button:hover, .search-button:hover {
     color: #1976D2;
 }
 
-/* Toastify 自定义样式 */
+/* Toast消息样式 */
 .toast-message {
-    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
-    font-size: 16px !important;
-    font-weight: 500 !important;
-    border-radius: 6px !important;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2) !important;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    font-size: 14px;
+    border-radius: 6px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* 不同类型Toast的特殊样式 */
+.toast-success {
+    background-color: #4CAF50 !important;
+    border-left: 5px solid #388E3C !important;
+}
+
+.toast-error {
+    background-color: #F44336 !important;
+    border-left: 5px solid #D32F2F !important;
+}
+
+.toast-warning {
+    background-color: #FF9800 !important;
+    border-left: 5px solid #F57C00 !important;
+}
+
+.toast-info {
+    background-color: #2196F3 !important;
+    border-left: 5px solid #1976D2 !important;
+}
+
+.toast-default {
+    background-color: #757575 !important;
+    border-left: 5px solid #616161 !important;
 }
 
 .spinner {
@@ -1148,6 +1173,22 @@ button:hover, .button:hover, .search-button:hover {
     margin-top: 15px;
 }
 
+/* 删除按钮样式 */
+.meta-item.delete-item {
+    color: #E53935;
+    margin-left: 10px;
+    transition: all 0.2s ease;
+}
+
+.meta-item.delete-item:hover {
+    color: #C62828;
+    transform: scale(1.1);
+}
+
+.meta-item.delete-item i {
+    font-size: 16px;
+}
+
 .visibility-toggle {
     padding: 6px 12px;
     border-radius: 20px;
@@ -1567,4 +1608,39 @@ button:hover, .button:hover, .search-button:hover {
 
 .visibility-toggle:hover {
     opacity: 0.8;
+}
+
+/* SweetAlert2 自定义样式 */
+.swal2-popup {
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
+    border-radius: 8px !important;
+}
+
+.swal2-title {
+    font-size: 1.5em !important;
+    font-weight: 600 !important;
+    color: #1976D2 !important;
+}
+
+.swal2-html-container {
+    font-size: 1.1em !important;
+    line-height: 1.6 !important;
+}
+
+.swal2-confirm {
+    background-color: #2196F3 !important;
+    box-shadow: 0 2px 5px rgba(33, 150, 243, 0.3) !important;
+}
+
+.swal2-confirm:hover {
+    background-color: #1976D2 !important;
+}
+
+.swal2-cancel {
+    background-color: #F44336 !important;
+    box-shadow: 0 2px 5px rgba(244, 67, 54, 0.3) !important;
+}
+
+.swal2-cancel:hover {
+    background-color: #D32F2F !important;
 } 

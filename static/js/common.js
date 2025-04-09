@@ -1,14 +1,109 @@
+// 定义Toast提示类型常量
+const TOAST_TYPE = {
+    SUCCESS: 'success',
+    ERROR: 'error',
+    WARNING: 'warning',
+    INFO: 'info',
+    DEFAULT: 'default'
+};
+
+// 定义模态框类型常量
+const MODAL_TYPE = {
+    SUCCESS: 'success',
+    ERROR: 'error',
+    WARNING: 'warning',
+    INFO: 'info',
+    QUESTION: 'question'
+};
+
 // 使用Toastify显示提示
-function showToast(message, success = true) {
+function showToast(message, type = TOAST_TYPE.SUCCESS) {
+    // 定义不同类型提示的颜色
+    const colors = {
+        [TOAST_TYPE.SUCCESS]: '#4CAF50',   // 绿色 - 成功提示
+        [TOAST_TYPE.ERROR]: '#F44336',     // 红色 - 错误提示
+        [TOAST_TYPE.WARNING]: '#FF9800',   // 橙色 - 警告提示
+        [TOAST_TYPE.INFO]: '#2196F3',      // 蓝色 - 信息提示
+        [TOAST_TYPE.DEFAULT]: '#757575'    // 灰色 - 默认提示
+    };
+    
+    // 获取颜色，如果类型不存在则使用默认颜色
+    const backgroundColor = colors[type] || colors[TOAST_TYPE.DEFAULT];
+    
     Toastify({
         text: message,
         duration: 3000,
         close: true,
         gravity: "top",
         position: "center",
-        backgroundColor: success ? "#4CAF50" : "#F44336",
-        className: "toast-message",
+        backgroundColor: backgroundColor,
+        className: `toast-message toast-${type}`,
     }).showToast();
+}
+
+// 使用SweetAlert2显示模态框提示
+function showModal(options) {
+    return Swal.fire(options);
+}
+
+// 显示确认对话框
+function showConfirm(options) {
+    const defaultOptions = {
+        title: '确认操作',
+        text: '您确定要执行此操作吗？',
+        icon: MODAL_TYPE.QUESTION,
+        showCancelButton: true,
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        focusCancel: true
+    };
+    
+    // 合并选项
+    const mergedOptions = {...defaultOptions, ...options};
+    
+    return Swal.fire(mergedOptions);
+}
+
+// 显示成功模态框
+function showSuccess(title, text) {
+    return showModal({
+        title: title || '操作成功',
+        text: text,
+        icon: MODAL_TYPE.SUCCESS,
+        confirmButtonText: '确定'
+    });
+}
+
+// 显示错误模态框
+function showError(title, text) {
+    return showModal({
+        title: title || '操作失败',
+        text: text,
+        icon: MODAL_TYPE.ERROR,
+        confirmButtonText: '确定'
+    });
+}
+
+// 显示警告模态框
+function showWarning(title, text) {
+    return showModal({
+        title: title || '警告',
+        text: text,
+        icon: MODAL_TYPE.WARNING,
+        confirmButtonText: '确定'
+    });
+}
+
+// 显示信息模态框
+function showInfo(title, text) {
+    return showModal({
+        title: title || '提示信息',
+        text: text,
+        icon: MODAL_TYPE.INFO,
+        confirmButtonText: '确定'
+    });
 }
 
 // 防抖函数
@@ -28,12 +123,12 @@ function debounce(func, wait) {
 function copyToClipboard(text) {
     return navigator.clipboard.writeText(text)
         .then(() => {
-            showToast('内容已复制到剪贴板');
+            showToast('内容已复制到剪贴板', TOAST_TYPE.SUCCESS);
             return true;
         })
         .catch(err => {
             console.error('无法复制内容: ', err);
-            showToast('复制失败，请手动复制内容');
+            showToast('复制失败，请手动复制内容', TOAST_TYPE.ERROR);
             return false;
         });
 }
@@ -161,7 +256,7 @@ function uploadContent(formData, button, originalHTML) {
         const contentType = formData.get('type');
         const typeText = contentType === 'markdown' ? 'Markdown' : 
                         contentType === 'text' ? '文本' : '图片';
-        showToast(`${typeText}内容分享成功！链接已复制到剪贴板`);
+        showToast(`${typeText}内容分享成功！链接已复制到剪贴板`, TOAST_TYPE.SUCCESS);
         
         // 禁用输入区域
         document.getElementById('content-title').setAttribute('readonly', 'readonly');
@@ -215,7 +310,7 @@ function uploadContent(formData, button, originalHTML) {
     })
     .catch(error => {
         console.error('上传失败:', error);
-        showToast('上传失败: ' + error.message);
+        showToast('上传失败: ' + error.message, TOAST_TYPE.ERROR);
         resetButton(button, originalHTML);
     });
 }
@@ -252,14 +347,14 @@ function toggleContentVisibility(element, contentId) {
             element.dataset.public = data.is_public;
             
             // 显示成功消息
-            showToast(data.message);
+            showToast(data.message, TOAST_TYPE.SUCCESS);
         } else {
             throw new Error(data.error || '操作失败');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        showToast('操作失败: ' + error.message);
+        showToast('操作失败: ' + error.message, TOAST_TYPE.ERROR);
     })
     .finally(() => {
         // 重新启用元素

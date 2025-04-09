@@ -259,7 +259,7 @@ function initPagination(data) {
         if (page >= 1 && page <= totalPages) {
             fetchContentPage(page);
         } else {
-            showToast('请输入有效的页码');
+            showToast('请输入有效的页码', TOAST_TYPE.WARNING);
             pageInput.value = currentPage;
         }
     });
@@ -442,6 +442,22 @@ function renderContent(items) {
         
         metaDiv.appendChild(timeSpan);
         
+        // 4. 添加删除按钮
+        const deleteSpan = document.createElement('span');
+        deleteSpan.className = 'meta-item delete-item';
+        deleteSpan.title = '删除内容';
+        deleteSpan.innerHTML = '<i class="fas fa-trash-alt"></i>';
+        deleteSpan.style.cursor = 'pointer';
+        deleteSpan.dataset.id = item.short_id;
+        
+        // 添加删除事件监听
+        deleteSpan.addEventListener('click', function(e) {
+            e.stopPropagation();
+            deleteContent(this, item.short_id);
+        });
+        
+        metaDiv.appendChild(deleteSpan);
+        
         // 组装内容项
         li.appendChild(title);
         li.appendChild(previewContainer);
@@ -450,6 +466,67 @@ function renderContent(items) {
         li.appendChild(metaDiv);
         
         contentListEl.appendChild(li);
+    });
+}
+
+// 删除内容
+function deleteContent(element, contentId) {
+    // 显示确认对话框
+    showConfirm({
+        title: '确认删除',
+        text: '确定要删除此内容吗？此操作不可恢复。',
+        icon: MODAL_TYPE.WARNING,
+        confirmButtonText: '删除',
+        cancelButtonText: '取消'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // 构建请求数据
+            const formData = new FormData();
+            formData.append('content_id', contentId);
+            
+            // 发送删除请求
+            fetch('/api/delete-content', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('删除内容失败，请重试');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // 删除成功，刷新当前页面
+                    showToast(data.message || '内容已成功删除', TOAST_TYPE.SUCCESS);
+                    
+                    // 从DOM中移除已删除的内容项
+                    const contentItem = element.closest('.content-item');
+                    if (contentItem) {
+                        contentItem.remove();
+                    }
+                    
+                    // 更新内容计数
+                    const countEl = document.getElementById('contentCount');
+                    const currentCount = parseInt(countEl.textContent, 10);
+                    if (!isNaN(currentCount) && currentCount > 0) {
+                        countEl.textContent = currentCount - 1;
+                    }
+                    
+                    // 如果当前页面已没有内容，刷新页面重新加载数据
+                    const contentList = document.getElementById('contentList');
+                    if (contentList.children.length === 0) {
+                        fetchContentPage(currentPage);
+                    }
+                } else {
+                    showToast(data.error || '删除内容失败', TOAST_TYPE.ERROR);
+                }
+            })
+            .catch(error => {
+                console.error('删除内容错误:', error);
+                showToast(error.message || '删除内容时发生错误', TOAST_TYPE.ERROR);
+            });
+        }
     });
 }
 
@@ -504,12 +581,12 @@ function loadContentPreview(button, contentId, summaryDiv) {
         button.style.display = 'none';
         
         // 显示成功提示
-        showToast('已加载内容预览');
+        showToast('已加载内容预览', TOAST_TYPE.INFO);
     })
     .catch(error => {
         console.error('Error:', error);
         button.innerHTML = '<i class="fas fa-exclamation-circle"></i> 加载失败，点击重试';
         button.disabled = false;
-        showToast('加载预览失败: ' + error.message);
+        showToast('加载预览失败: ' + error.message, TOAST_TYPE.ERROR);
     });
 } 

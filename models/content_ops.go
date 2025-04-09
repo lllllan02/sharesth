@@ -165,3 +165,21 @@ func FindPublicContentsPaginated(query string, page int, perPage int) (int64, []
 
 	return total, results
 }
+
+// DeleteContent 根据短链接ID和来源删除内容
+func DeleteContent(shortID string, source string) error {
+	// 查找指定的内容
+	var content Content
+	result := DB.Where("short_id = ? AND source = ?", shortID, source).First(&content)
+	if result.Error != nil {
+		return fmt.Errorf("内容不存在或无权删除: %v", result.Error)
+	}
+
+	// 执行删除操作
+	result = DB.Delete(&content)
+	if result.Error != nil {
+		return fmt.Errorf("删除内容失败: %v", result.Error)
+	}
+
+	return nil
+}
