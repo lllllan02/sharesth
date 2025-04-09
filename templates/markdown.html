@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SharedSTH - Markdown 内容</title>
+    
+    <!-- 所有 CSS 和 JS 引用集中在这里 -->
+    <!-- CSS 引用 -->
     <link rel="stylesheet" href="/static/css/styles.css">
     <!-- 引入 Markdown 渲染库 CSS -->
     <link rel="stylesheet" href="/static/vendor/github-markdown/github-markdown-light.css">
@@ -13,21 +16,8 @@
     <link rel="stylesheet" href="/static/vendor/toastify/toastify.min.css">
     <!-- 引入Font Awesome图标库 -->
     <link rel="stylesheet" href="/static/vendor/fontawesome/all.min.css">
-</head>
-<body>
-    <div class="container">
-        <h1>Markdown 内容</h1>
-        {{if .Title}}
-        <div class="content-title" id="title">{{.Title}}</div>
-        {{end}}
-        <div class="markdown-body" id="content"></div>
-        
-        <div class="action-buttons">
-            <button class="button copy-button" id="copy-button"><i class="fas fa-copy"></i> 复制原始内容</button>
-            <a href="/" class="button"><i class="fas fa-home"></i> 返回首页</a>
-        </div>
-    </div>
     
+    <!-- JS 引用 -->
     <!-- 引入 Markdown 渲染库 -->
     <script src="/static/vendor/marked/marked.min.js"></script>
     <!-- 引入语法高亮 JS -->
@@ -45,5 +35,19 @@
     
     <!-- 引入页面专用JS -->
     <script src="/static/js/pages/markdown.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Markdown 内容</h1>
+        {{if .Title}}
+        <div class="content-title" id="title">{{.Title}}</div>
+        {{end}}
+        <div class="markdown-body" id="content"></div>
+        
+        <div class="action-buttons">
+            <button class="button copy-button" id="copy-button"><i class="fas fa-copy"></i> 复制原始内容</button>
+            <a href="/" class="button"><i class="fas fa-home"></i> 返回首页</a>
+        </div>
+    </div>
 </body>
 </html> 

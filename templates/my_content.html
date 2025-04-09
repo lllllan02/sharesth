@@ -4,14 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>我的分享记录</title>
+    
+    <!-- 所有 CSS 和 JS 引用集中在这里 -->
+    <!-- CSS 引用 -->
     <!-- 先引入Bootstrap CSS -->
     <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
     <!-- 后引入自定义CSS，确保能覆盖Bootstrap样式 -->
     <link rel="stylesheet" href="/static/css/styles.css">
     <!-- 引入Font Awesome图标库 -->
     <link rel="stylesheet" href="/static/vendor/fontawesome/all.min.css">
+    
+    <!-- JS 引用 -->
     <!-- 引入jQuery库 -->
     <script src="/static/vendor/jquery/jquery.min.js"></script>
+    <!-- 引入Toastify JS库用于显示提示 -->
+    <script src="/static/vendor/toastify/toastify.min.js"></script>
+    <!-- 引入公共JS -->
+    <script src="/static/js/common.js"></script>
+    <!-- 引入页面专用JS -->
+    <script src="/static/js/pages/my_content.js"></script>
 </head>
 <body>
     <div class="container">
@@ -55,12 +66,5 @@
             <a href="/"><i class="fas fa-home"></i> 返回首页</a>
         </div>
     </div>
-    
-    <!-- 引入Toastify JS库用于显示提示 -->
-    <script src="/static/vendor/toastify/toastify.min.js"></script>
-    <!-- 引入公共JS -->
-    <script src="/static/js/common.js"></script>
-    <!-- 引入页面专用JS -->
-    <script src="/static/js/pages/my_content.js"></script>
 </body>
 </html>

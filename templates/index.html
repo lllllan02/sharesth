@@ -4,13 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShareSTH - 内容分享平台</title>
+    
+    <!-- 所有 CSS 和 JS 引用集中在这里 -->
+    <!-- CSS 引用 -->
     <!-- 引入 Markdown 编辑器样式 (优先加载) -->
     <link rel="stylesheet" href="/static/vendor/easymde/easymde.min.css">
+    <!-- 引入自定义CSS -->
     <link rel="stylesheet" href="/static/css/styles.css">
     <!-- 引入Toastify CSS -->
     <link rel="stylesheet" href="/static/vendor/toastify/toastify.min.css">
     <!-- 引入Font Awesome图标库 -->
     <link rel="stylesheet" href="/static/vendor/fontawesome/all.min.css">
+    
+    <!-- JS 引用 -->
+    <!-- 引入 Markdown 编辑器 -->
+    <script src="/static/vendor/easymde/easymde.min.js"></script>
+    <!-- 引入 Markdown 渲染库 -->
+    <script src="/static/vendor/marked/marked.min.js"></script>
+    <!-- 引入Toastify JS库 -->
+    <script src="/static/vendor/toastify/toastify.min.js"></script>
+    <!-- 引入公共JS -->
+    <script src="/static/js/common.js"></script>
+    <!-- 引入页面专用JS -->
+    <script src="/static/js/pages/index.js"></script>
 </head>
 <body>
     <div class="container">
@@ -118,16 +134,5 @@
             <a href="/public"><i class="fas fa-globe"></i> 浏览公开内容</a>
         </div>
     </div>
-    
-    <!-- 引入 Markdown 编辑器 -->
-    <script src="/static/vendor/easymde/easymde.min.js"></script>
-    <!-- 引入 Markdown 渲染库 -->
-    <script src="/static/vendor/marked/marked.min.js"></script>
-    <!-- 引入Toastify JS库 -->
-    <script src="/static/vendor/toastify/toastify.min.js"></script>
-    <!-- 引入公共JS -->
-    <script src="/static/js/common.js"></script>
-    <!-- 引入页面专用JS -->
-    <script src="/static/js/pages/index.js"></script>
 </body>
 </html>
