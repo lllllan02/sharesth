@@ -43,12 +43,12 @@
         
         <!-- 标题输入 (对所有类型通用) -->
         <div class="common-content">
-            <div class="input-group">
+            <div class="input-group" style="margin-bottom: 2px;">
                 <label for="content-title" class="input-label">标题 (可选)</label>
                 <input type="text" id="content-title" class="title-input" placeholder="输入内容标题...">
             </div>
             
-            <div class="privacy-setting">
+            <div class="privacy-setting" style="margin-bottom: 0; padding: 2px 10px;">
                 <label class="privacy-label">
                     <input type="checkbox" id="is-public"> 
                     <span>公开此内容 <i class="fas fa-question-circle tooltip-icon" data-tooltip="公开内容将显示在公共页面上，任何人都可以浏览"></i></span>
@@ -57,9 +57,9 @@
         </div>
         
         <!-- Markdown 内容 -->
-        <div class="content active" id="markdown-content">
-            <label class="input-label">Markdown 内容</label>
-            <div class="editor-container">
+        <div class="content active close-to-top" id="markdown-content" style="margin-top: -20px;">
+            <label class="input-label" style="margin-bottom: 1px;">Markdown 内容</label>
+            <div class="editor-container" style="margin-top: 2px;">
                 <textarea id="md-editor"></textarea>
             </div>
             
@@ -72,8 +72,8 @@
         </div>
         
         <!-- 纯文本内容 -->
-        <div class="content hidden" id="text-content">
-            <label class="input-label">文本内容</label>
+        <div class="content hidden close-to-top" id="text-content" style="margin-top: -20px;">
+            <label class="input-label" style="margin-bottom: 1px;">文本内容</label>
             <textarea id="text-editor" placeholder="在这里输入要分享的纯文本内容..."></textarea>
             
             <div class="button-group">
@@ -82,8 +82,8 @@
         </div>
         
         <!-- 图片内容 -->
-        <div class="content hidden" id="image-content">
-            <label class="input-label">上传图片</label>
+        <div class="content hidden close-to-top" id="image-content" style="margin-top: -20px;">
+            <label class="input-label" style="margin-bottom: 1px;">上传图片</label>
             <div class="file-input-wrapper">
                 <div class="file-input-button"><i class="fas fa-upload"></i> 选择图片文件</div>
                 <input type="file" id="image-upload" accept="image/*">
@@ -255,14 +255,27 @@
             const tooltipIcons = document.querySelectorAll('.tooltip-icon');
             tooltipIcons.forEach(icon => {
                 icon.addEventListener('mouseenter', function(e) {
+                    // 创建工具提示元素
                     const tooltip = document.createElement('div');
                     tooltip.className = 'tooltip';
                     tooltip.textContent = this.getAttribute('data-tooltip');
+                    
+                    // 先添加到DOM但不可见，以便计算尺寸
+                    tooltip.style.visibility = 'hidden';
                     document.body.appendChild(tooltip);
                     
-                    const rect = this.getBoundingClientRect();
-                    tooltip.style.top = (rect.top - tooltip.offsetHeight - 5) + 'px';
-                    tooltip.style.left = (rect.left + rect.width/2 - tooltip.offsetWidth/2) + 'px';
+                    // 获取图标和工具提示的位置信息
+                    const iconRect = this.getBoundingClientRect();
+                    const tooltipRect = tooltip.getBoundingClientRect();
+                    
+                    // 计算位置 - 在图标上方居中
+                    const top = iconRect.top - tooltipRect.height - 10;
+                    const left = iconRect.left + (iconRect.width/2) - (tooltipRect.width/2);
+                    
+                    // 设置位置并显示
+                    tooltip.style.top = Math.max(5, top) + window.scrollY + 'px'; // 确保不超出顶部
+                    tooltip.style.left = Math.max(5, left) + window.scrollX + 'px';
+                    tooltip.style.visibility = 'visible';
                 });
                 
                 icon.addEventListener('mouseleave', function() {

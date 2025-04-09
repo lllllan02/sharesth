@@ -62,7 +62,7 @@ input[type="text"][readonly], textarea[readonly] {
 
 .title-input {
     width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 .search-input, .filter-input {
@@ -71,7 +71,7 @@ input[type="text"][readonly], textarea[readonly] {
 
 .input-label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 2px;
     color: #1976D2;
     font-size: 14px;
     font-weight: 500;
@@ -160,8 +160,8 @@ button:hover, .button:hover, .search-button:hover {
 /* 通用内容容器 */
 .common-content {
     width: 100%;
-    margin-bottom: 20px;
-    padding: 5px 0;
+    margin-bottom: 0;
+    padding: 0;
     position: relative;
     z-index: 5;
 }
@@ -169,7 +169,13 @@ button:hover, .button:hover, .search-button:hover {
 .content {
     width: 100%;
     box-sizing: border-box;
-    padding: 5px 0;
+    padding: 0;
+    margin-top: -5px;
+}
+
+/* 更强的负边距用于特定内容 */
+.close-to-top {
+    margin-top: -10px !important;
 }
 
 .content.active {
@@ -497,7 +503,7 @@ button:hover, .button:hover, .search-button:hover {
 /* Markdown 编辑器样式 - 强化版 */
 .editor-container {
     margin-bottom: 20px;
-    margin-top: 10px;
+    margin-top: 5px;
     min-height: 350px;
 }
 
@@ -853,14 +859,6 @@ button:hover, .button:hover, .search-button:hover {
     z-index: 5;
 }
 
-.input-label {
-    display: block;
-    margin-bottom: 5px;
-    color: #1976D2;
-    font-size: 14px;
-    font-weight: 500;
-}
-
 /* 动作按钮组 */
 .action-buttons {
     display: flex;
@@ -978,8 +976,8 @@ button:hover, .button:hover, .search-button:hover {
 
 /* 公开/隐藏设置样式 */
 .privacy-setting {
-    margin: 10px 0 20px 0;
-    padding: 10px;
+    margin: 5px 0 0 0;
+    padding: 2px 10px;
     background-color: #E3F2FD;
     border-radius: 4px;
     display: flex;
