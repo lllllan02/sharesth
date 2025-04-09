@@ -11,6 +11,24 @@
     <link rel="stylesheet" href="/static/vendor/toastify/toastify.min.css">
     <!-- 引入Font Awesome图标库 -->
     <link rel="stylesheet" href="/static/vendor/fontawesome/all.min.css">
+    <style>
+        .tooltip {
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            z-index: 1000;
+            max-width: 250px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .tooltip-icon {
+            cursor: help;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -33,7 +51,7 @@
             <div class="privacy-setting">
                 <label class="privacy-label">
                     <input type="checkbox" id="is-public"> 
-                    <span>公开此内容 <i class="fas fa-question-circle" title="公开内容将显示在公共页面上，任何人都可以浏览"></i></span>
+                    <span>公开此内容 <i class="fas fa-question-circle tooltip-icon" data-tooltip="公开内容将显示在公共页面上，任何人都可以浏览"></i></span>
                 </label>
             </div>
         </div>
@@ -230,6 +248,28 @@
                     onError('上传图片失败: ' + error.message);
                 });
             }
+        });
+        
+        // 工具提示功能初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            const tooltipIcons = document.querySelectorAll('.tooltip-icon');
+            tooltipIcons.forEach(icon => {
+                icon.addEventListener('mouseenter', function(e) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'tooltip';
+                    tooltip.textContent = this.getAttribute('data-tooltip');
+                    document.body.appendChild(tooltip);
+                    
+                    const rect = this.getBoundingClientRect();
+                    tooltip.style.top = (rect.top - tooltip.offsetHeight - 5) + 'px';
+                    tooltip.style.left = (rect.left + rect.width/2 - tooltip.offsetWidth/2) + 'px';
+                });
+                
+                icon.addEventListener('mouseleave', function() {
+                    const tooltips = document.querySelectorAll('.tooltip');
+                    tooltips.forEach(t => t.remove());
+                });
+            });
         });
         
         // 标签切换功能
