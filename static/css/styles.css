@@ -133,7 +133,7 @@ button:hover, .button:hover, .search-button:hover {
 /* 页面布局组件 */
 .tabs {
     display: flex;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
     border-bottom: 1px solid #BBDEFB;
 }
 
@@ -160,7 +160,7 @@ button:hover, .button:hover, .search-button:hover {
 /* 通用内容容器 */
 .common-content {
     width: 100%;
-    margin-bottom: 0;
+    margin-bottom: 15px;
     padding: 0;
     position: relative;
     z-index: 5;
@@ -170,12 +170,12 @@ button:hover, .button:hover, .search-button:hover {
     width: 100%;
     box-sizing: border-box;
     padding: 0;
-    margin-top: -5px;
+    margin-top: 15px;
 }
 
 /* 更强的负边距用于特定内容 */
 .close-to-top {
-    margin-top: -10px !important;
+    margin-top: 10px !important;
 }
 
 .content.active {
@@ -322,7 +322,7 @@ button:hover, .button:hover, .search-button:hover {
 .content-item {
     position: relative;
     padding: 15px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     background-color: #fff;
     border: 1px solid #BBDEFB;
     border-radius: 8px;
@@ -854,7 +854,7 @@ button:hover, .button:hover, .search-button:hover {
 /* 输入组 */
 .input-group {
     width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     position: relative;
     z-index: 5;
 }
