@@ -88,7 +88,7 @@ function searchBySourceId(sourceId) {
     document.getElementById('titleSearch').style.display = 'none';
     
     // 发送请求
-    fetch(`/api/source-search?source_id=${encodeURIComponent(sourceId)}`)
+    fetch(`/api/source-content?source=${encodeURIComponent(sourceId)}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('获取数据失败');
@@ -120,7 +120,7 @@ function displaySearchResults(data) {
     document.getElementById('loading').style.display = 'none';
     
     // 处理无结果情况
-    if (!data.user || data.contents.length === 0) {
+    if (data.total === 0 || !data.items || data.items.length === 0) {
         document.getElementById('noResults').style.display = 'block';
         return;
     }
@@ -130,10 +130,15 @@ function displaySearchResults(data) {
     searchResults.style.display = 'block';
     
     // 显示用户信息
-    displayUserInfo(data.user);
+    displayUserInfo({
+        id: data.items[0]?.id || '未知ID',
+        sourceId: data.source,
+        registerTime: data.items[0]?.createTime || new Date().toISOString(),
+        contentCount: data.total
+    });
     
     // 显示内容列表
-    displayContentList(data.contents);
+    displayContentList(data.items);
     
     // 显示标题搜索框
     document.getElementById('titleSearch').style.display = 'block';
@@ -230,7 +235,7 @@ function createContentItem(item) {
     
     // 添加内容链接
     const contentLink = document.createElement('a');
-    contentLink.href = item.link;
+    contentLink.href = item.link || ('/' + item.short_id);
     contentLink.className = 'content-link';
     contentLink.appendChild(titleEl);
     
