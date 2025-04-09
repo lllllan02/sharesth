@@ -18,6 +18,7 @@
             margin: 10px 0;
             padding: 10px;
             border-radius: 5px;
+            position: relative;
         }
         
         .content-summary {
@@ -26,6 +27,7 @@
             line-height: 1.5;
             max-height: 80px;
             overflow: hidden;
+            margin-bottom: 10px;
         }
         
         .content-thumbnail {
@@ -82,6 +84,35 @@
             margin-right: 5px;
         }
         
+        /* 添加视图链接样式 */
+        .content-view-link {
+            display: inline-block;
+            margin-top: 2px;
+            margin-bottom: 5px;
+            font-size: 0.85em;
+        }
+        
+        .content-view-link a {
+            display: inline-flex;
+            align-items: center;
+            color: #0066cc;
+            text-decoration: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background-color: rgba(0, 102, 204, 0.08);
+            transition: all 0.2s;
+        }
+        
+        .content-view-link a:hover {
+            background-color: rgba(0, 102, 204, 0.15);
+            color: #004c99;
+        }
+        
+        .content-view-link i {
+            margin-right: 5px;
+            font-size: 0.9em;
+        }
+        
         /* 内容项样式优化 */
         .content-item {
             margin-bottom: 20px;
@@ -134,32 +165,123 @@
         .content-actions {
             display: flex;
             justify-content: space-between;
-            margin-top: 12px;
-            padding-top: 12px;
+            margin-top: 6px;
+            padding-top: 8px;
             border-top: 1px solid #eee;
         }
         
+        /* 添加右下角信息区域样式 */
+        .content-meta {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-top: 8px;
+            font-size: 0.85em;
+            padding: 4px 0;
+            height: 24px;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            margin-left: 12px;
+            position: relative;
+            height: 100%;
+        }
+        
+        .meta-item:first-child {
+            margin-left: 0;
+        }
+        
+        .meta-item + .meta-item::before {
+            content: "";
+            position: absolute;
+            left: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 10px;
+            width: 1px;
+            background-color: #ddd;
+        }
+        
+        .meta-item i {
+            margin-right: 0;
+            font-size: 0.95em;
+            opacity: 0.75;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        
+        .meta-item.time-item i {
+            margin-right: 4px;
+        }
+        
+        .meta-item.time-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .type-icon {
+            color: #666;
+        }
+        
         .visibility-toggle {
-            padding: 5px 10px;
-            border-radius: 4px;
+            background: none;
             border: none;
             cursor: pointer;
-            font-size: 0.9em;
-            transition: background-color 0.2s;
-        }
-        
-        .visibility-toggle.public {
-            background-color: #e6f9e6;
-            color: #006600;
-        }
-        
-        .visibility-toggle.private {
-            background-color: #f9e6e6;
-            color: #cc0000;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            font-size: 0.85em;
+            transition: opacity 0.2s;
         }
         
         .visibility-toggle:hover {
-            opacity: 0.9;
+            opacity: 0.8;
+        }
+        
+        /* 新样式：状态标签 */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            font-weight: 500;
+            line-height: 16px;
+            height: 18px;
+            box-sizing: border-box;
+            vertical-align: middle;
+        }
+        
+        .status-badge.public {
+            background-color: rgba(0, 204, 68, 0.15);
+            color: #00a344;
+        }
+        
+        .status-badge.private {
+            background-color: rgba(255, 51, 51, 0.15);
+            color: #e62e2e;
+        }
+        
+        .status-badge::before {
+            content: "";
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+        
+        .status-badge.public::before {
+            background-color: #00cc44;
+        }
+        
+        .status-badge.private::before {
+            background-color: #ff3333;
         }
     </style>
 </head>
@@ -537,42 +659,7 @@
                 const li = document.createElement('li');
                 li.className = 'content-item';
                 
-                const header = document.createElement('div');
-                header.className = 'content-header';
-                
-                const typeSpan = document.createElement('span');
-                let typeClass = 'type-text';
-                let typeText = '文本内容';
-                let typeIcon = '<i class="fas fa-file-alt"></i> ';
-                
-                if (item.type === 'markdown') {
-                    typeClass = 'type-markdown';
-                    typeText = 'Markdown 内容';
-                    typeIcon = '<i class="fab fa-markdown"></i> ';
-                } else if (item.type === 'image') {
-                    typeClass = 'type-image';
-                    typeText = '图片内容';
-                    typeIcon = '<i class="fas fa-image"></i> ';
-                }
-                
-                typeSpan.className = 'content-type ' + typeClass;
-                typeSpan.innerHTML = typeIcon + typeText;
-                
-                const timeSpan = document.createElement('span');
-                timeSpan.className = 'content-time';
-                const createDate = new Date(item.createTime);
-                const formatOptions = { 
-                    year: 'numeric', 
-                    month: '2-digit', 
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                };
-                timeSpan.innerHTML = '<i class="far fa-clock"></i> ' + createDate.toLocaleString('zh-CN', formatOptions);
-                
-                header.appendChild(typeSpan);
-                header.appendChild(timeSpan);
-                
+                // 创建标题
                 const title = document.createElement('h3');
                 title.className = 'content-title';
                 title.textContent = item.title || '无标题';
@@ -654,35 +741,88 @@
                     }
                 }
                 
+                // 添加查看内容链接（放在内容预览区域之后，操作区域之前）
+                const viewLinkDiv = document.createElement('div');
+                viewLinkDiv.className = 'content-view-link';
+                viewLinkDiv.innerHTML = `<a href="${item.link}" target="_blank"><i class="fas fa-external-link-alt"></i> 查看内容</a>`;
+                
+                // 创建操作区域（只保留元数据）
                 const actions = document.createElement('div');
                 actions.className = 'content-actions';
                 
-                // 添加查看链接
-                const linkDiv = document.createElement('div');
-                linkDiv.className = 'content-link';
-                linkDiv.innerHTML = `<a href="${item.link}" target="_blank"><i class="fas fa-external-link-alt"></i> 查看内容</a>`;
+                // 创建右下角元数据区域
+                const metaDiv = document.createElement('div');
+                metaDiv.className = 'content-meta';
                 
-                // 添加公开/隐藏切换按钮
-                const visibilityBtn = document.createElement('button');
-                visibilityBtn.className = 'visibility-toggle ' + (item.is_public ? 'public' : 'private');
-                visibilityBtn.innerHTML = item.is_public ? 
-                    '<i class="fas fa-eye"></i> 公开' : 
-                    '<i class="fas fa-eye-slash"></i> 隐藏';
-                visibilityBtn.dataset.id = item.short_id;
-                visibilityBtn.dataset.public = item.is_public;
+                // 1. 添加内容类型图标
+                const typeSpan = document.createElement('span');
+                typeSpan.className = 'meta-item';
+                
+                let typeIcon = '';
+                let typeTitle = '';
+                
+                if (item.type === 'markdown') {
+                    typeIcon = '<i class="fab fa-markdown type-icon"></i>';
+                    typeTitle = 'Markdown 内容';
+                } else if (item.type === 'image') {
+                    typeIcon = '<i class="fas fa-image type-icon"></i>';
+                    typeTitle = '图片内容';
+                } else {
+                    typeIcon = '<i class="fas fa-file-alt type-icon"></i>';
+                    typeTitle = '文本内容';
+                }
+                
+                typeSpan.innerHTML = typeIcon;
+                typeSpan.title = typeTitle;
+                metaDiv.appendChild(typeSpan);
+                
+                // 2. 添加公开/隐藏图标
+                const visibilitySpan = document.createElement('span');
+                visibilitySpan.className = 'meta-item';
+                
+                const statusBadge = document.createElement('span');
+                statusBadge.className = `status-badge ${item.is_public ? 'public' : 'private'}`;
+                statusBadge.textContent = item.is_public ? '公开' : '私密';
+                
+                visibilitySpan.appendChild(statusBadge);
+                visibilitySpan.dataset.id = item.short_id;
+                visibilitySpan.dataset.public = item.is_public;
                 
                 // 添加切换公开/隐藏状态的事件监听
-                visibilityBtn.addEventListener('click', function() {
+                visibilitySpan.addEventListener('click', function() {
                     toggleContentVisibility(this, item.short_id);
                 });
+                visibilitySpan.style.cursor = 'pointer';
                 
-                actions.appendChild(linkDiv);
-                actions.appendChild(visibilityBtn);
+                metaDiv.appendChild(visibilitySpan);
                 
-                li.appendChild(header);
+                // 3. 添加时间信息（放在最右边）
+                const timeSpan = document.createElement('span');
+                timeSpan.className = 'meta-item time-item';
+                const createDate = new Date(item.createTime);
+                const formatOptions = { 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                };
+                
+                const timeIcon = document.createElement('i');
+                timeIcon.className = 'far fa-clock';
+                timeSpan.appendChild(timeIcon);
+                
+                const timeText = document.createTextNode(' ' + createDate.toLocaleString('zh-CN', formatOptions));
+                timeSpan.appendChild(timeText);
+                
+                metaDiv.appendChild(timeSpan);
+                
+                // 组装内容项
                 li.appendChild(title);
-                li.appendChild(previewContainer);  // 添加内容预览区域
+                li.appendChild(previewContainer);
+                li.appendChild(viewLinkDiv);
                 li.appendChild(actions);
+                li.appendChild(metaDiv);
                 
                 contentListEl.appendChild(li);
             });
@@ -792,9 +932,9 @@
         }
         
         // 切换内容公开/隐藏状态
-        function toggleContentVisibility(button, contentId) {
-            // 禁用按钮，防止重复点击
-            button.disabled = true;
+        function toggleContentVisibility(element, contentId) {
+            // 禁用元素，防止重复点击
+            element.style.pointerEvents = 'none';
             
             // 准备表单数据
             const formData = new FormData();
@@ -808,16 +948,19 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // 更新按钮状态
+                    // 更新状态标签
+                    const statusBadge = element.querySelector('.status-badge');
+                    
                     if (data.is_public) {
-                        button.innerHTML = '<i class="fas fa-eye"></i> 公开';
-                        button.classList.remove('private');
-                        button.classList.add('public');
+                        statusBadge.className = 'status-badge public';
+                        statusBadge.textContent = '公开';
                     } else {
-                        button.innerHTML = '<i class="fas fa-eye-slash"></i> 隐藏';
-                        button.classList.remove('public');
-                        button.classList.add('private');
+                        statusBadge.className = 'status-badge private';
+                        statusBadge.textContent = '私密';
                     }
+                    
+                    // 更新数据属性
+                    element.dataset.public = data.is_public;
                     
                     // 显示成功消息
                     showToast(data.message);
@@ -830,8 +973,8 @@
                 showToast('操作失败: ' + error.message);
             })
             .finally(() => {
-                // 重新启用按钮
-                button.disabled = false;
+                // 重新启用元素
+                element.style.pointerEvents = 'auto';
             });
         }
 
