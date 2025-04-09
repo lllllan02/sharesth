@@ -91,7 +91,22 @@ func FindContentsBySourcePaginated(source string, query string, page int, perPag
 	// 格式化结果
 	var results []map[string]interface{}
 	for _, content := range contents {
-		results = append(results, map[string]interface{}{
+		// 提取内容摘要
+		var summary string
+		if content.Type == "image" {
+			// 图片内容不需要摘要
+			summary = ""
+		} else {
+			// 文本或Markdown内容，提取前150个字符作为摘要
+			if len(content.Data) > 150 {
+				summary = content.Data[:150] + "..."
+			} else {
+				summary = content.Data
+			}
+		}
+
+		// 构建基本结果
+		result := map[string]interface{}{
 			"id":         content.ID,
 			"short_id":   content.ShortID,
 			"type":       content.Type,
@@ -99,7 +114,19 @@ func FindContentsBySourcePaginated(source string, query string, page int, perPag
 			"link":       "/" + content.ShortID,
 			"title":      content.Title,
 			"is_public":  content.IsPublic,
-		})
+			"summary":    summary, // 添加内容摘要
+		}
+
+		// 根据内容类型添加特定字段
+		if content.Type == "image" {
+			// 对于图片类型，添加图片URL
+			result["content_url"] = content.Data // 图片路径作为内容URL
+		} else {
+			// 对于文本类型，添加完整内容
+			result["content"] = content.Data
+		}
+
+		results = append(results, result)
 	}
 
 	return total, results

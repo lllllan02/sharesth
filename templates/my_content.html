@@ -12,6 +12,156 @@
     <link rel="stylesheet" href="/static/vendor/fontawesome/all.min.css">
     <!-- 引入jQuery库 -->
     <script src="/static/vendor/jquery/jquery.min.js"></script>
+    <style>
+        /* 内容预览区域样式 */
+        .content-preview {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .content-summary {
+            color: #555;
+            font-size: 0.9em;
+            line-height: 1.5;
+            max-height: 80px;
+            overflow: hidden;
+        }
+        
+        .content-thumbnail {
+            max-width: 200px;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: block;
+            margin: 5px 0;
+        }
+        
+        .image-preview-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .image-size-info {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.8em;
+        }
+        
+        /* 加载预览按钮样式 */
+        .load-preview-btn {
+            background-color: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 5px 10px;
+            margin-top: 8px;
+            font-size: 0.85em;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+        
+        .load-preview-btn:hover {
+            background-color: #e8e8e8;
+            color: #333;
+        }
+        
+        .load-preview-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .load-preview-btn i {
+            margin-right: 5px;
+        }
+        
+        /* 内容项样式优化 */
+        .content-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .content-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        /* 内容标题样式 */
+        .content-title {
+            margin: 8px 0;
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        /* 增加内容类型标签样式 */
+        .content-type {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        
+        .type-text {
+            background-color: #e6f3ff;
+            color: #0066cc;
+        }
+        
+        .type-markdown {
+            background-color: #e6f9f3;
+            color: #00997a;
+        }
+        
+        .type-image {
+            background-color: #f9e6f3;
+            color: #cc0099;
+        }
+        
+        /* 调整内容操作按钮样式 */
+        .content-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+        }
+        
+        .visibility-toggle {
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.2s;
+        }
+        
+        .visibility-toggle.public {
+            background-color: #e6f9e6;
+            color: #006600;
+        }
+        
+        .visibility-toggle.private {
+            background-color: #f9e6e6;
+            color: #cc0000;
+        }
+        
+        .visibility-toggle:hover {
+            opacity: 0.9;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -101,6 +251,9 @@
             if (searchTerm) {
                 params.append('query', searchTerm);
             }
+            
+            // 记录请求参数用于调试
+            console.log('API请求参数:', params.toString());
             
             // 发送请求
             fetch(`/api/my-content?${params.toString()}`, {
@@ -424,6 +577,83 @@
                 title.className = 'content-title';
                 title.textContent = item.title || '无标题';
                 
+                // 创建内容预览区域
+                const previewContainer = document.createElement('div');
+                previewContainer.className = 'content-preview';
+                
+                // 根据内容类型显示不同的预览
+                if (item.type === 'image') {
+                    // 图片内容显示缩略图
+                    const thumbnailImg = document.createElement('img');
+                    thumbnailImg.className = 'content-thumbnail';
+                    thumbnailImg.src = item.thumbnail_url || item.image_url || item.content_url || '/static/img/no-image.png';
+                    thumbnailImg.alt = item.title || '图片预览';
+                    thumbnailImg.onerror = function() {
+                        this.src = '/static/img/no-image.png';
+                        this.alt = '图片加载失败';
+                    };
+                    
+                    const imgWrapper = document.createElement('div');
+                    imgWrapper.className = 'image-preview-wrapper';
+                    imgWrapper.appendChild(thumbnailImg);
+                    
+                    // 添加图片大小信息（如果有）
+                    if (item.width && item.height) {
+                        const sizeInfo = document.createElement('div');
+                        sizeInfo.className = 'image-size-info';
+                        sizeInfo.textContent = `${item.width} × ${item.height}`;
+                        imgWrapper.appendChild(sizeInfo);
+                    }
+                    
+                    previewContainer.appendChild(imgWrapper);
+                } else {
+                    // 文本或Markdown内容显示摘要
+                    const summaryDiv = document.createElement('div');
+                    summaryDiv.className = 'content-summary';
+                    
+                    // 添加调试信息，查看实际接收到的数据结构
+                    console.log('内容项数据结构:', item);
+                    
+                    // 获取内容摘要
+                    let previewText = item.summary || '';
+                    
+                    // 如果没有内容预览，添加加载预览按钮
+                    let loadPreviewBtn = null;
+                    if (!previewText) {
+                        previewText = item.type === 'markdown' ? 
+                            '内容加载中...' : '无内容预览';
+                        
+                        loadPreviewBtn = document.createElement('button');
+                        loadPreviewBtn.className = 'load-preview-btn';
+                        loadPreviewBtn.innerHTML = '<i class="fas fa-eye"></i> 显示内容预览';
+                        loadPreviewBtn.dataset.id = item.short_id || item.id;
+                    }
+                    
+                    // 截取摘要，避免太长
+                    if (previewText.length > 150) {
+                        previewText = previewText.substring(0, 150) + '...';
+                    }
+                    
+                    // 如果是Markdown内容且有内容，简化处理
+                    if (item.type === 'markdown' && previewText && previewText !== '内容加载中...' && previewText !== '无内容预览') {
+                        previewText = simplifyMarkdown(previewText);
+                    }
+                    
+                    // 设置纯文本内容，更安全
+                    summaryDiv.textContent = previewText;
+                    
+                    previewContainer.appendChild(summaryDiv);
+                    
+                    // 如果有加载按钮，添加到预览容器
+                    if (loadPreviewBtn) {
+                        // 添加按钮点击事件
+                        loadPreviewBtn.addEventListener('click', function() {
+                            loadContentPreview(this, this.dataset.id, summaryDiv);
+                        });
+                        previewContainer.appendChild(loadPreviewBtn);
+                    }
+                }
+                
                 const actions = document.createElement('div');
                 actions.className = 'content-actions';
                 
@@ -451,9 +681,113 @@
                 
                 li.appendChild(header);
                 li.appendChild(title);
+                li.appendChild(previewContainer);  // 添加内容预览区域
                 li.appendChild(actions);
                 
                 contentListEl.appendChild(li);
+            });
+        }
+        
+        // 简单处理Markdown文本，用于预览
+        function simplifyMarkdown(text) {
+            // 移除所有Markdown特殊字符和标记
+            
+            // 移除图片语法
+            text = text.replace(/!\[.*?\]\(.*?\)/g, '');
+            
+            // 移除链接语法，只保留链接文本
+            text = text.replace(/\[(.*?)\]\(.*?\)/g, '$1');
+            
+            // 移除标题符号
+            text = text.replace(/^#+\s+/gm, '');
+            
+            // 移除强调符号
+            text = text.replace(/\*\*(.*?)\*\*/g, '$1');
+            text = text.replace(/\*(.*?)\*/g, '$1');
+            text = text.replace(/__(.*?)__/g, '$1');
+            text = text.replace(/_(.*?)_/g, '$1');
+            
+            // 移除代码块
+            text = text.replace(/```[\s\S]*?```/g, '');
+            
+            // 移除行内代码
+            text = text.replace(/`(.*?)`/g, '$1');
+            
+            // 移除引用符号
+            text = text.replace(/^>\s+/gm, '');
+            
+            // 移除分隔线
+            text = text.replace(/^-{3,}$|^_{3,}$/gm, '');
+            
+            // 移除列表符号
+            text = text.replace(/^[\*\-+]\s+/gm, '');
+            text = text.replace(/^\d+\.\s+/gm, '');
+            
+            // 移除多余空行和合并空白
+            text = text.replace(/\n{2,}/g, ' ');
+            text = text.replace(/\s+/g, ' ');
+            
+            return text.trim();
+        }
+        
+        // 加载内容预览
+        function loadContentPreview(button, contentId, summaryDiv) {
+            // 禁用按钮，显示加载中状态
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 加载中...';
+            
+            // 构建查询参数
+            const params = new URLSearchParams();
+            params.append('content_id', contentId);
+            params.append('include_content', 'true');
+            
+            // 发送请求获取内容
+            fetch(`/api/content-detail?${params.toString()}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('获取内容预览失败');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('获取到内容详情:', data);
+                
+                // 更新预览内容
+                let previewText = data.content || data.summary || '';
+                
+                if (!previewText) {
+                    throw new Error('未找到可预览内容');
+                }
+                
+                // 截取内容
+                if (previewText.length > 150) {
+                    previewText = previewText.substring(0, 150) + '...';
+                }
+                
+                // 如果是Markdown，简化处理
+                if (data.type === 'markdown') {
+                    previewText = simplifyMarkdown(previewText);
+                }
+                
+                // 更新预览内容
+                summaryDiv.textContent = previewText;
+                
+                // 隐藏按钮
+                button.style.display = 'none';
+                
+                // 显示成功提示
+                showToast('已加载内容预览');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                button.innerHTML = '<i class="fas fa-exclamation-circle"></i> 加载失败，点击重试';
+                button.disabled = false;
+                showToast('加载预览失败: ' + error.message);
             });
         }
         
