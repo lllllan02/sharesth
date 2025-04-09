@@ -394,6 +394,17 @@
             easyMDE.value('');
             easyMDE.codemirror.setOption('readOnly', false);
             
+            // 重置Markdown编辑器工具栏
+            document.querySelectorAll('.editor-toolbar button, .editor-toolbar a').forEach(btn => {
+                btn.classList.remove('disabled');
+                btn.style.opacity = '';
+                btn.style.pointerEvents = '';
+            });
+            
+            // 重置预览切换
+            document.getElementById('toggle-preview').style.opacity = '';
+            document.getElementById('toggle-preview').style.pointerEvents = '';
+            
             // 重置文本编辑器
             document.getElementById('text-editor').value = '';
             document.getElementById('text-editor').removeAttribute('readonly');
@@ -404,11 +415,20 @@
             document.getElementById('image-preview-wrapper').classList.add('hidden');
             document.getElementById('share-image').disabled = true;
             
+            // 重置公开设置复选框
+            const isPublicCheckbox = document.getElementById('is-public');
+            isPublicCheckbox.disabled = false;
+            isPublicCheckbox.checked = false;
+            isPublicCheckbox.parentElement.style.opacity = '';
+            isPublicCheckbox.parentElement.style.cursor = '';
+            
             // 恢复所有按钮状态
             document.querySelectorAll('button.button').forEach(btn => {
                 btn.disabled = false;
                 btn.style.backgroundColor = '#2196F3';
                 btn.style.cursor = 'pointer';
+                btn.style.opacity = '';
+                btn.style.pointerEvents = '';
             });
             
             // 重置分享按钮文本
@@ -573,11 +593,45 @@
                 // 禁用输入区域
                 document.getElementById('content-title').setAttribute('readonly', 'readonly');
                 
+                // 禁用公开设置复选框
+                const isPublicCheckbox = document.getElementById('is-public');
+                isPublicCheckbox.disabled = true;
+                isPublicCheckbox.parentElement.style.opacity = '0.7';
+                isPublicCheckbox.parentElement.style.cursor = 'not-allowed';
+                
                 const activeContent = document.querySelector('.content:not(.hidden)');
                 if (activeContent.id === 'markdown-content') {
                     easyMDE.codemirror.setOption('readOnly', true);
+                    
+                    // 禁用Markdown编辑器工具栏
+                    document.querySelectorAll('.editor-toolbar button, .editor-toolbar a').forEach(btn => {
+                        btn.classList.add('disabled');
+                        btn.style.opacity = '0.5';
+                        btn.style.pointerEvents = 'none';
+                    });
+                    
+                    // 禁用分享按钮
+                    document.getElementById('share-md').disabled = true;
+                    document.getElementById('share-md').style.opacity = '0.5';
+                    document.getElementById('share-md').style.pointerEvents = 'none';
+                    
+                    // 禁用预览切换
+                    document.getElementById('toggle-preview').style.opacity = '0.5';
+                    document.getElementById('toggle-preview').style.pointerEvents = 'none';
+                    
                 } else if (activeContent.id === 'text-content') {
                     document.getElementById('text-editor').setAttribute('readonly', 'readonly');
+                    
+                    // 禁用文本分享按钮
+                    document.getElementById('share-text').disabled = true;
+                    document.getElementById('share-text').style.opacity = '0.5';
+                    document.getElementById('share-text').style.pointerEvents = 'none';
+                    
+                } else if (activeContent.id === 'image-content') {
+                    // 禁用图片分享按钮
+                    document.getElementById('share-image').disabled = true;
+                    document.getElementById('share-image').style.opacity = '0.5';
+                    document.getElementById('share-image').style.pointerEvents = 'none';
                 }
                 
                 // 重置按钮
