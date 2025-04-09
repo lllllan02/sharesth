@@ -15,6 +15,8 @@
     <link rel="stylesheet" href="/static/vendor/fontawesome/all.min.css">
     
     <!-- JS 引用 -->
+    <!-- 引入Headroom.js导航栏滚动效果库 -->
+    <script src="/static/vendor/headroom/headroom.min.js"></script>
     <!-- 引入jQuery库 -->
     <script src="/static/vendor/jquery/jquery.min.js"></script>
     <!-- 引入Toastify库 -->
@@ -25,7 +27,19 @@
     <script src="/static/js/pages/source_search.js"></script>
 </head>
 <body>
-    <div class="container">
+    <!-- 页头导航 -->
+    <div class="header-wrapper">
+        <div class="header-content">
+            <div class="header-nav">
+                <a href="/"><i class="fas fa-home"></i> 首页</a>
+                <a href="/my-content"><i class="fas fa-list"></i> 我的分享</a>
+                <a href="/search" class="active"><i class="fas fa-search"></i> 查询用户分享</a>
+                <a href="/public"><i class="fas fa-globe"></i> 浏览公开内容</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container main-content">
         <h1>查询用户分享记录</h1>
         <div class="search-form">
             <input type="text" id="sourceIdInput" placeholder="输入用户来源ID">
@@ -54,10 +68,6 @@
             <div id="contentList" class="content-list">
                 <!-- 内容项将通过JavaScript动态添加 -->
             </div>
-        </div>
-        
-        <div class="back-link">
-            <a href="/"><i class="fas fa-home"></i> 返回首页</a>
         </div>
     </div>
 </body>

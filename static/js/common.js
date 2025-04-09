@@ -1,24 +1,26 @@
 // 使用Toastify显示提示
-function showToast(message) {
+function showToast(message, success = true) {
     Toastify({
         text: message,
-        duration: 2000,
-        close: false,
-        gravity: "center", // 居中显示
-        position: "center", // 居中显示
-        backgroundColor: "linear-gradient(to right, #1976D2, #2196F3)",
+        duration: 3000,
+        close: true,
+        gravity: "top",
+        position: "center",
+        backgroundColor: success ? "#4CAF50" : "#F44336",
         className: "toast-message",
-        stopOnFocus: false // 用户聚焦时不停止
     }).showToast();
 }
 
 // 防抖函数
 function debounce(func, wait) {
     let timeout;
-    return function(...args) {
+    return function() {
         const context = this;
+        const args = arguments;
         clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(context, args), wait);
+        timeout = setTimeout(function() {
+            func.apply(context, args);
+        }, wait);
     };
 }
 
@@ -268,4 +270,73 @@ function toggleContentVisibility(element, contentId) {
 // DOM 加载完成后初始化工具提示
 document.addEventListener('DOMContentLoaded', function() {
     initTooltips();
+});
+
+// 导航栏智能显示/隐藏功能
+document.addEventListener('DOMContentLoaded', function() {
+    // 获取header元素
+    const header = document.querySelector('.header-wrapper');
+    if (!header) return; // 如果页面没有header，则直接返回
+    
+    let lastScrollTop = 0;
+    const headerHeight = header.offsetHeight;
+    const minScrollDistance = 30; // 最小滚动距离阈值，滚动超过这个距离才触发隐藏
+    
+    // 使用防抖函数包装滚动事件处理，提高性能并使慢速滚动也能被检测
+    const scrollHandler = function() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        // 始终在顶部附近时显示导航栏
+        if (scrollTop <= headerHeight) {
+            header.classList.remove('headroom--unpinned');
+            header.classList.add('headroom--pinned');
+            header.classList.add('headroom--top');
+            header.classList.remove('headroom--not-top');
+            lastScrollTop = scrollTop;
+            return;
+        }
+        
+        // 不在顶部时添加阴影效果
+        header.classList.remove('headroom--top');
+        header.classList.add('headroom--not-top');
+        
+        // 计算滚动距离
+        const scrollDistance = Math.abs(scrollTop - lastScrollTop);
+        
+        // 只有滚动距离超过阈值时才触发隐藏/显示
+        if (scrollDistance >= minScrollDistance) {
+            // 向下滚动超过阈值隐藏导航栏
+            if (scrollTop > lastScrollTop) {
+                header.classList.remove('headroom--pinned');
+                header.classList.add('headroom--unpinned');
+            } 
+            // 向上滚动时立即显示导航栏，无需达到阈值
+            else {
+                header.classList.remove('headroom--unpinned');
+                header.classList.add('headroom--pinned');
+            }
+            
+            // 更新上次滚动位置
+            lastScrollTop = scrollTop;
+        }
+        // 如果是向上滚动，即使距离很小也显示导航栏（更敏感的向上响应）
+        else if (scrollTop < lastScrollTop) {
+            header.classList.remove('headroom--unpinned');
+            header.classList.add('headroom--pinned');
+            // 更新上次滚动位置
+            lastScrollTop = scrollTop;
+        }
+    };
+    
+    // 不使用防抖，以便能立即响应滚动
+    window.addEventListener('scroll', scrollHandler);
+    
+    // 确保初始状态正确
+    header.classList.add('headroom');
+    header.classList.add('headroom--pinned');
+    if (window.pageYOffset <= headerHeight) {
+        header.classList.add('headroom--top');
+    } else {
+        header.classList.add('headroom--not-top');
+    }
 }); 

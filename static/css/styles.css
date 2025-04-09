@@ -1,3 +1,108 @@
+/* 页头导航 */
+.header-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 15px 0;
+    margin-bottom: 0;
+    background-color: #2196F3;
+    width: 100%;
+    position: relative;
+}
+
+.header-wrapper {
+    background-color: #2196F3;
+    width: 100%;
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.25s ease;
+}
+
+/* Headroom.js 效果 */
+.headroom {
+    will-change: transform;
+    transition: transform 250ms ease;
+}
+.headroom--pinned {
+    transform: translateY(0%);
+}
+.headroom--unpinned {
+    transform: translateY(-100%);
+}
+.headroom--top {
+    box-shadow: none;
+}
+.headroom--not-top {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.header-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.main-content {
+    margin-top: 20px;
+    position: relative;
+}
+
+.header-nav a {
+    display: flex;
+    align-items: center;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.header-nav a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.header-nav a i {
+    margin-right: 5px;
+    color: #fff;
+}
+
+.header-nav a.active {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+}
+
+@media (max-width: 768px) {
+    .header-nav {
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 10px 0;
+    }
+    
+    .header-nav a {
+        font-size: 0.9em;
+        padding: 5px 10px;
+    }
+    
+    .main-content {
+        margin-top: 20px;
+    }
+}
+
+/* 旧页脚样式为可选隐藏 */
+.footer {
+    display: none;
+    margin-top: 30px;
+    text-align: center;
+    font-size: 0.9em;
+    color: #777;
+}
+
 /* 通用样式 */
 body {
     font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
@@ -185,22 +290,6 @@ button:hover, .button:hover, .search-button:hover {
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
-}
-
-.footer {
-    margin-top: 30px;
-    text-align: center;
-    padding: 15px;
-    border-top: 1px solid #BBDEFB;
-}
-
-.footer a {
-    color: #1976D2;
-    margin: 0 10px;
-}
-
-.footer a:hover {
-    color: #1565C0;
 }
 
 .back-link {

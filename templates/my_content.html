@@ -15,6 +15,8 @@
     <link rel="stylesheet" href="/static/vendor/fontawesome/all.min.css">
     
     <!-- JS 引用 -->
+    <!-- 引入Headroom.js导航栏滚动效果库 -->
+    <script src="/static/vendor/headroom/headroom.min.js"></script>
     <!-- 引入jQuery库 -->
     <script src="/static/vendor/jquery/jquery.min.js"></script>
     <!-- 引入Toastify JS库用于显示提示 -->
@@ -25,7 +27,19 @@
     <script src="/static/js/pages/my_content.js"></script>
 </head>
 <body>
-    <div class="container">
+    <!-- 页头导航 -->
+    <div class="header-wrapper">
+        <div class="header-content">
+            <div class="header-nav">
+                <a href="/"><i class="fas fa-home"></i> 首页</a>
+                <a href="/my-content" class="active"><i class="fas fa-list"></i> 我的分享</a>
+                <a href="/search"><i class="fas fa-search"></i> 查询用户分享</a>
+                <a href="/public"><i class="fas fa-globe"></i> 浏览公开内容</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container main-content">
         <h1>我的分享记录</h1>
         
         <div id="loading" class="loading">
@@ -60,10 +74,6 @@
                 <p>没有找到匹配的内容</p>
                 <p>尝试其他关键词或清除搜索条件</p>
             </div>
-        </div>
-        
-        <div class="back-link">
-            <a href="/"><i class="fas fa-home"></i> 返回首页</a>
         </div>
     </div>
 </body>
