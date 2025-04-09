@@ -39,49 +39,11 @@
     
     <!-- 传递内容数据 -->
     <script>
-        // 配置marked选项
-        marked.setOptions({
-            highlight: function(code, lang) {
-                if (lang && hljs.getLanguage(lang)) {
-                    try { 
-                        return hljs.highlight(code, { language: lang }).value;
-                    } catch(e) {}
-                }
-                return hljs.highlightAuto(code).value;
-            },
-            breaks: true,
-            gfm: true
-        });
-        
-        // 解码HTML实体
-        function decodeHTMLEntities(text) {
-            const textarea = document.createElement('textarea');
-            textarea.innerHTML = text;
-            return textarea.value;
-        }
-        
-        // 获取内容
-        var rawContent = "{{.Content}}";
-        var decodedContent = decodeHTMLEntities(rawContent);
-
-        // 渲染Markdown内容
-        try {
-            document.getElementById('content').innerHTML = marked.parse(decodedContent);
-            
-            // 应用代码高亮
-            document.querySelectorAll('pre code').forEach((block) => {
-                hljs.highlightBlock(block);
-            });
-        } catch (e) {
-            console.error("Markdown渲染错误:", e);
-            document.getElementById('content').innerHTML = 
-                '<div class="error-preview">Markdown 渲染失败，可能是内容格式有问题。<br>错误: ' + e.message + '</div>';
-        }
-        
-        // 复制原始内容
-        document.getElementById('copy-button').addEventListener('click', function() {
-            copyToClipboard(decodedContent);
-        });
+        // 注入内容数据供JS使用
+        var contentData = "{{.Content}}";
     </script>
+    
+    <!-- 引入页面专用JS -->
+    <script src="/static/js/pages/markdown.js"></script>
 </body>
 </html> 
