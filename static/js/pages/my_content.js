@@ -298,11 +298,28 @@ function renderContent(items) {
             // 图片内容显示缩略图
             const thumbnailImg = document.createElement('img');
             thumbnailImg.className = 'content-thumbnail';
-            thumbnailImg.src = item.thumbnail_url || item.image_url || item.content_url || '/static/img/no-image.png';
+            
+            // 创建一个全局变量来记录已经尝试过的无效图片URL，避免重复请求
+            if (!window.invalidImageUrls) {
+                window.invalidImageUrls = new Set();
+            }
+            
+            // 首先检查当前图片URL是否已知无效
+            const imageUrl = item.thumbnail_url || item.image_url || item.content_url;
+            if (imageUrl && !window.invalidImageUrls.has(imageUrl)) {
+                thumbnailImg.src = imageUrl;
+            } else {
+                thumbnailImg.src = '/static/img/no-image.png';
+            }
+            
             thumbnailImg.alt = item.title || '图片预览';
             thumbnailImg.onerror = function() {
-                this.src = '/static/img/no-image.png';
-                this.alt = '图片加载失败';
+                // 记录无效的URL，避免下次再次尝试加载
+                if (this.src !== '/static/img/no-image.png') {
+                    window.invalidImageUrls.add(this.src);
+                    this.src = '/static/img/no-image.png';
+                    this.alt = '图片加载失败';
+                }
             };
             
             const imgWrapper = document.createElement('div');
