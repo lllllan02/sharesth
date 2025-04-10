@@ -5,6 +5,7 @@ let currentPage = 1;
 let pageSize = 10;
 let totalItems = 0;
 let searchTerm = '';
+let typeFilter = 'all'; // 内容类型筛选
 
 // 页面加载时获取数据
 document.addEventListener('DOMContentLoaded', function() {
@@ -31,6 +32,34 @@ function searchContent() {
     }
 }
 
+// 通过类型筛选内容
+window.filterByType = function(type) {
+    if (type !== typeFilter) {
+        typeFilter = type;
+        currentPage = 1; // 重置到第一页
+        
+        // 更新类型筛选器的激活状态
+        updateTypeFilterActiveState();
+        
+        // 重新获取数据
+        fetchContentPage(currentPage);
+    }
+};
+
+// 更新类型筛选器的激活状态
+function updateTypeFilterActiveState() {
+    // 移除所有类型筛选器的激活状态
+    document.querySelectorAll('.type-stat').forEach(el => {
+        el.classList.remove('active');
+    });
+    
+    // 为当前激活的类型添加激活状态
+    const activeFilter = document.querySelector(`.type-stat[data-type="${typeFilter}"]`);
+    if (activeFilter) {
+        activeFilter.classList.add('active');
+    }
+}
+
 // 从后端获取指定页的内容
 function fetchContentPage(page) {
     // 显示加载中
@@ -43,6 +72,9 @@ function fetchContentPage(page) {
     params.append('per_page', pageSize);
     if (searchTerm) {
         params.append('query', searchTerm);
+    }
+    if (typeFilter !== 'all') {
+        params.append('type', typeFilter);
     }
     
     // 记录请求参数用于调试
@@ -73,6 +105,9 @@ function fetchContentPage(page) {
         
         // 显示内容
         displayContent(data);
+        
+        // 更新类型筛选器的激活状态
+        updateTypeFilterActiveState();
     })
     .catch(error => {
         console.error('Error:', error);
@@ -98,6 +133,18 @@ function displayContent(data) {
     contentCountEl.textContent = data.total || 0;
     totalItems = data.total || 0;
     
+    // 更新类型统计数量
+    if (data.typeCounts) {
+        document.getElementById('markdownCount').textContent = data.typeCounts.markdown || 0;
+        document.getElementById('textCount').textContent = data.typeCounts.text || 0;
+        document.getElementById('imageCount').textContent = data.typeCounts.image || 0;
+    } else {
+        // 如果后端未提供类型统计，暂时清空计数
+        document.getElementById('markdownCount').textContent = '-';
+        document.getElementById('textCount').textContent = '-';
+        document.getElementById('imageCount').textContent = '-';
+    }
+    
     // 显示或隐藏相关元素
     if (totalItems > 0) {
         // 有内容，渲染当前页内容
@@ -111,7 +158,7 @@ function displayContent(data) {
         noContentEl.style.display = 'none';
         
         // 处理搜索结果
-        if (searchTerm && data.items.length === 0) {
+        if ((searchTerm || typeFilter !== 'all') && data.items.length === 0) {
             noSearchResultEl.style.display = 'block';
         } else {
             noSearchResultEl.style.display = 'none';
@@ -121,8 +168,8 @@ function displayContent(data) {
         contentListEl.style.display = 'none';
         document.getElementById('pagination-container').style.display = 'none';
         
-        if (searchTerm) {
-            // 搜索无结果
+        if (searchTerm || typeFilter !== 'all') {
+            // 搜索或筛选无结果
             noSearchResultEl.style.display = 'block';
             noContentEl.style.display = 'none';
         } else {

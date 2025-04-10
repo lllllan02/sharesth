@@ -70,8 +70,8 @@ func FindPublicContents() []map[string]interface{} {
 	return results
 }
 
-// FindContentsBySourcePaginated 分页查找指定来源的内容，支持标题搜索
-func FindContentsBySourcePaginated(source string, query string, page int, perPage int) (int64, []map[string]interface{}) {
+// FindContentsBySourcePaginated 分页查找指定来源的内容，支持标题搜索和类型筛选
+func FindContentsBySourcePaginated(source string, query string, typeFilter string, page int, perPage int) (int64, []map[string]interface{}, map[string]int64) {
 	var contents []Content
 	db := DB.Where("source = ?", source)
 
@@ -80,9 +80,31 @@ func FindContentsBySourcePaginated(source string, query string, page int, perPag
 		db = db.Where("title LIKE ?", "%"+query+"%")
 	}
 
+	// 如果提供了类型筛选，添加类型条件
+	if typeFilter != "" {
+		db = db.Where("type = ?", typeFilter)
+	}
+
 	// 计算总记录数
 	var total int64
 	db.Model(&Content{}).Count(&total)
+
+	// 统计各类型数量
+	typeCounts := make(map[string]int64)
+	var typeStats []struct {
+		Type  string `gorm:"column:type"`
+		Count int64  `gorm:"column:count"`
+	}
+
+	DB.Model(&Content{}).
+		Where("source = ?", source).
+		Select("type, count(*) as count").
+		Group("type").
+		Scan(&typeStats)
+
+	for _, stat := range typeStats {
+		typeCounts[stat.Type] = stat.Count
+	}
 
 	// 分页查询
 	offset := (page - 1) * perPage
@@ -129,7 +151,7 @@ func FindContentsBySourcePaginated(source string, query string, page int, perPag
 		results = append(results, result)
 	}
 
-	return total, results
+	return total, results, typeCounts
 }
 
 // FindPublicContentsPaginated 分页查找公开的内容，支持标题搜索

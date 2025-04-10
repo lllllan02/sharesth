@@ -1675,4 +1675,164 @@ button:hover, .button:hover, .search-button:hover {
 
 .source-id-container:hover .copy-icon {
     color: #0066cc;
+}
+
+/* 内容类型统计样式 */
+.content-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.content-type-stats {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.type-stat {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.9em;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    user-select: none;
+}
+
+.type-stat i {
+    margin-right: 6px;
+}
+
+.type-stat.markdown {
+    background-color: #f0f7ff;
+    color: #0057b8;
+    border: 1px solid #cce0ff;
+}
+
+.type-stat.text {
+    background-color: #f0f7f0;
+    color: #1a8754;
+    border: 1px solid #c3e6cb;
+}
+
+.type-stat.image {
+    background-color: #fff6e5;
+    color: #ff8c00;
+    border: 1px solid #ffe0b2;
+}
+
+.type-stat.all {
+    background-color: #f5f5f5;
+    color: #616161;
+    border: 1px solid #e0e0e0;
+}
+
+.type-stat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.type-stat.active {
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+    font-weight: bold;
+}
+
+.type-stat.markdown.active {
+    background-color: #e3f0ff;
+    box-shadow: 0 0 0 2px rgba(0, 87, 184, 0.4);
+}
+
+.type-stat.text.active {
+    background-color: #e4f3e4;
+    box-shadow: 0 0 0 2px rgba(26, 135, 84, 0.4);
+}
+
+.type-stat.image.active {
+    background-color: #ffedcc;
+    box-shadow: 0 0 0 2px rgba(255, 140, 0, 0.4);
+}
+
+.type-stat.all.active {
+    background-color: #ebebeb;
+    box-shadow: 0 0 0 2px rgba(97, 97, 97, 0.4);
+}
+
+/* 筛选控件样式 */
+.filter-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.filter-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-label {
+    font-weight: 500;
+    color: #1976D2;
+    white-space: nowrap;
+}
+
+.filter-select {
+    padding: 8px 12px;
+    border: 1px solid #BBDEFB;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #333;
+    font-size: 0.95em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-select:hover, .filter-select:focus {
+    border-color: #2196F3;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+}
+
+.search-box {
+    flex-grow: 1;
+}
+
+@media (max-width: 768px) {
+    .filter-controls {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .search-box, .filter-box {
+        width: 100%;
+    }
+}
+
+/* 内容类型统计样式 - 单行版 */
+.content-stats-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.content-stats-row .type-stat {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.9em;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    user-select: none;
+}
+
+.content-stats-row .type-stat i {
+    margin-right: 6px;
 } 

@@ -61,12 +61,27 @@
                         <i class="fas fa-copy copy-icon"></i>
                     </span>
                 </p>
-                <p>分享内容数量: <span id="contentCount">0</span></p>
+                <div class="content-stats-row">
+                    <span class="type-stat all" title="显示全部内容" data-type="all" onclick="filterByType('all')">
+                        <i class="fas fa-layer-group"></i> 全部 <span id="contentCount">0</span>
+                    </span>
+                    <span class="type-stat markdown" title="点击筛选Markdown内容" data-type="markdown" onclick="filterByType('markdown')">
+                        <i class="fab fa-markdown"></i> <span id="markdownCount">0</span>
+                    </span>
+                    <span class="type-stat text" title="点击筛选文本内容" data-type="text" onclick="filterByType('text')">
+                        <i class="fas fa-file-alt"></i> <span id="textCount">0</span>
+                    </span>
+                    <span class="type-stat image" title="点击筛选图片内容" data-type="image" onclick="filterByType('image')">
+                        <i class="fas fa-image"></i> <span id="imageCount">0</span>
+                    </span>
+                </div>
             </div>
             
-            <div class="search-box">
-                <input type="text" id="searchInput" class="search-input" placeholder="搜索标题关键词...">
-                <button id="searchButton" class="search-button"><i class="fas fa-search"></i> 搜索</button>
+            <div class="filter-controls">
+                <div class="search-box">
+                    <input type="text" id="searchInput" class="search-input" placeholder="搜索标题关键词...">
+                    <button id="searchButton" class="search-button"><i class="fas fa-search"></i> 搜索</button>
+                </div>
             </div>
             
             <ul id="contentList" class="content-list">
