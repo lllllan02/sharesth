@@ -1835,4 +1835,27 @@ button:hover, .button:hover, .search-button:hover {
 
 .content-stats-row .type-stat i {
     margin-right: 6px;
+}
+
+/* 内容标题样式 - 可点击版本 */
+.content-title.clickable {
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.content-title.clickable a {
+    color: #1976D2;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: block;
+}
+
+.content-title.clickable a:hover {
+    color: #0d47a1;
+    text-decoration: none;
+}
+
+.content-title.clickable a::after {
+    content: "";
+    margin-left: 0;
 } 

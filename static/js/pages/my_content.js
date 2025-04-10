@@ -331,10 +331,16 @@ function renderContent(items) {
         const li = document.createElement('li');
         li.className = 'content-item';
         
-        // 创建标题
+        // 创建标题并使其可点击
         const title = document.createElement('h3');
-        title.className = 'content-title';
-        title.textContent = item.title || '无标题';
+        title.className = 'content-title clickable';
+        
+        // 创建标题链接
+        const titleLink = document.createElement('a');
+        titleLink.href = item.link;
+        titleLink.target = "_blank";
+        titleLink.textContent = item.title || '无标题';
+        title.appendChild(titleLink);
         
         // 创建内容预览区域
         const previewContainer = document.createElement('div');
@@ -430,11 +436,6 @@ function renderContent(items) {
             }
         }
         
-        // 添加查看内容链接（放在内容预览区域之后，操作区域之前）
-        const viewLinkDiv = document.createElement('div');
-        viewLinkDiv.className = 'content-view-link';
-        viewLinkDiv.innerHTML = `<a href="${item.link}" target="_blank"><i class="fas fa-external-link-alt"></i> 查看内容</a>`;
-        
         // 创建操作区域（只保留元数据）
         const actions = document.createElement('div');
         actions.className = 'content-actions';
@@ -525,7 +526,6 @@ function renderContent(items) {
         // 组装内容项
         li.appendChild(title);
         li.appendChild(previewContainer);
-        li.appendChild(viewLinkDiv);
         li.appendChild(actions);
         li.appendChild(metaDiv);
         
