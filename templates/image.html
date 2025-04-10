@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="/static/vendor/fontawesome/all.min.css">
     
     <!-- JS 引用 -->
+    <!-- 引入Headroom.js导航栏滚动效果库 -->
+    <script src="/static/vendor/headroom/headroom.min.js"></script>
     <!-- 引入Toastify JS库 -->
     <script src="/static/vendor/toastify/toastify.min.js"></script>
     <!-- 引入公共JS -->
@@ -22,7 +24,19 @@
     <script src="/static/js/pages/image.js"></script>
 </head>
 <body>
-    <div class="container">
+    <!-- 页头导航 -->
+    <div class="header-wrapper">
+        <div class="header-content">
+            <div class="header-nav">
+                <a href="/"><i class="fas fa-home"></i> 首页</a>
+                <a href="/my-content"><i class="fas fa-list"></i> 我的分享</a>
+                <a href="/search"><i class="fas fa-search"></i> 查询用户分享</a>
+                <a href="/public"><i class="fas fa-globe"></i> 浏览公开内容</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container main-content">
         <div class="content-header">
             <div class="content-title-wrapper">
                 <h1 class="content-title">{{ .Title }}</h1>
@@ -40,11 +54,6 @@
                 <a href="{{ .ImagePath }}" download class="button download-button"><i class="fas fa-download"></i> 下载图片</a>
                 <a href="/" class="button"><i class="fas fa-home"></i> 回到首页</a>
             </div>
-        </div>
-        
-        <div class="footer">
-            <a href="/my-content"><i class="fas fa-list"></i> 我的分享</a>
-            <a href="/search"><i class="fas fa-search"></i> 查询用户分享</a>
         </div>
     </div>
 </body>
