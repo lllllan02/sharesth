@@ -55,7 +55,12 @@
         
         <div id="contentContainer" style="display: none;">
             <div class="user-info">
-                <p>当前来源: <span id="sourceId"></span></p>
+                <p>当前来源: 
+                    <span class="source-id-container" title="点击复制来源ID" onclick="copySourceId()">
+                        <span id="sourceId" class="source-id"></span>
+                        <i class="fas fa-copy copy-icon"></i>
+                    </span>
+                </p>
                 <p>分享内容数量: <span id="contentCount">0</span></p>
             </div>
             

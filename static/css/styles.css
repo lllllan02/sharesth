@@ -1643,4 +1643,36 @@ button:hover, .button:hover, .search-button:hover {
 
 .swal2-cancel:hover {
     background-color: #D32F2F !important;
+}
+
+/* 来源ID样式 */
+.source-id-container {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.source-id {
+    background-color: #f0f8ff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    color: #0066cc;
+    border: 1px solid #cce5ff;
+    transition: all 0.2s ease;
+}
+
+.source-id:hover {
+    background-color: #e6f2ff;
+    box-shadow: 0 0 5px rgba(0, 102, 204, 0.3);
+}
+
+.copy-icon {
+    margin-left: 6px;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.source-id-container:hover .copy-icon {
+    color: #0066cc;
 } 

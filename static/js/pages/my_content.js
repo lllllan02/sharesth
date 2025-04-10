@@ -606,4 +606,27 @@ function loadContentPreview(button, contentId, summaryDiv) {
         button.disabled = false;
         showToast('加载预览失败: ' + error.message, TOAST_TYPE.ERROR);
     });
-} 
+}
+
+// 复制来源ID到剪贴板 - 暴露为全局函数，使HTML onclick属性能调用
+window.copySourceId = function() {
+    const sourceId = document.getElementById('sourceId').textContent;
+    if (!sourceId) return;
+    
+    // 使用公共方法复制文本
+    copyToClipboard(sourceId)
+        .then(success => {
+            if (success) {
+                // 添加视觉反馈
+                const sourceIdEl = document.querySelector('.source-id');
+                sourceIdEl.style.backgroundColor = '#e6ffe6';
+                sourceIdEl.style.borderColor = '#99cc99';
+                
+                // 恢复原样式
+                setTimeout(() => {
+                    sourceIdEl.style.backgroundColor = '';
+                    sourceIdEl.style.borderColor = '';
+                }, 500);
+            }
+        });
+}; 
