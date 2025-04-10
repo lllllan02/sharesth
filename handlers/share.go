@@ -15,12 +15,8 @@ import (
 
 // handleTextContent 处理文本和Markdown内容
 func handleTextContent(c *gin.Context, contentType, clientIdentifier, title string, isPublic bool) (models.Content, error) {
-	// 获取内容 (适配旧版本，同时接受 'markdown' 和 'content' 参数)
+	// 获取内容
 	contentData := c.PostForm("content")
-	if contentData == "" {
-		contentData = c.PostForm("markdown") // 兼容旧版本
-	}
-
 	if contentData == "" {
 		return models.Content{}, fmt.Errorf("未提供内容")
 	}

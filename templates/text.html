@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SharedSTH - 分享内容</title>
+    <title>{{if .Title}}{{.Title}}{{else}}分享内容{{end}} - SharedSTH</title>
     
     <!-- 所有 CSS 和 JS 引用集中在这里 -->
     <!-- CSS 引用 -->
@@ -23,10 +23,17 @@
 </head>
 <body>
     <div class="container">
-        <h1>分享的内容</h1>
-        {{if .Title}}
-        <div class="content-title" id="title">{{.Title}}</div>
-        {{end}}
+        <div class="content-header">
+            <div class="content-title-wrapper">
+                {{if .Title}}
+                <h1 id="title" class="content-title">{{.Title}}</h1>
+                {{else}}
+                <h1 class="content-title">分享内容</h1>
+                {{end}}
+                <span class="content-type-badge"><i class="fas fa-file-alt"></i></span>
+            </div>
+        </div>
+        
         <div class="content-box" id="content">{{.Content}}</div>
         
         <div class="action-buttons">
