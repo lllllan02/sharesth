@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑内容 - SharedSTH</title>
+    
+    <!-- 所有 CSS 和 JS 引用集中在这里 -->
+    <!-- CSS 引用 -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <!-- 引入EasyMDE编辑器样式 -->
+    <link rel="stylesheet" href="/static/vendor/easymde/easymde.min.css">
+    <!-- 引入 Markdown 渲染库 CSS -->
+    <link rel="stylesheet" href="/static/vendor/github-markdown/github-markdown-light.css">
+    <!-- 引入语法高亮 CSS -->
+    <link rel="stylesheet" href="/static/vendor/highlight/github.min.css">
+    <!-- 引入 Toastify CSS -->
+    <link rel="stylesheet" href="/static/vendor/toastify/toastify.min.css">
+    <!-- 引入Font Awesome图标库 -->
+    <link rel="stylesheet" href="/static/vendor/fontawesome/all.min.css">
+    
+    <!-- JS 引用 -->
+    <!-- 引入Headroom.js导航栏滚动效果库 -->
+    <script src="/static/vendor/headroom/headroom.min.js"></script>
+    <!-- 引入EasyMDE编辑器JS -->
+    <script src="/static/vendor/easymde/easymde.min.js"></script>
+    <!-- 引入 Markdown 渲染库 -->
+    <script src="/static/vendor/marked/marked.min.js"></script>
+    <!-- 引入语法高亮 JS -->
+    <script src="/static/vendor/highlight/highlight.min.js"></script>
+    <!-- 引入 Toastify JS 库 -->
+    <script src="/static/vendor/toastify/toastify.min.js"></script>
+    <!-- 引入 SweetAlert2 弹窗库 -->
+    <script src="/static/vendor/sweetalert2/sweetalert2.min.js"></script>
+    <!-- 引入公共 JS -->
+    <script src="/static/js/common.js"></script>
+    
+    <!-- 传递内容数据 -->
+    <script>
+        // 注入内容数据供JS使用
+        var contentData = {{.content_json}};
+    </script>
+    
+    <!-- 引入页面专用JS -->
+    <script src="/static/js/pages/edit.js"></script>
+</head>
+<body>
+    <!-- 页头导航 -->
+    <div class="header-wrapper">
+        <div class="header-content">
+            <div class="header-nav">
+                <a href="/"><i class="fas fa-home"></i> 首页</a>
+                <a href="/my-content"><i class="fas fa-list"></i> 我的分享</a>
+                <a href="/search"><i class="fas fa-search"></i> 查询用户分享</a>
+                <a href="/public"><i class="fas fa-globe"></i> 浏览公开内容</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container main-content">
+        <div class="content-header">
+            <div class="content-title-wrapper">
+                <h1 class="content-title">编辑内容</h1>
+                <span class="content-type-badge" id="content-type-badge"></span>
+            </div>
+        </div>
+        
+        <div class="edit-container">
+            <div class="form-group">
+                <label for="content-title">标题</label>
+                <input type="text" id="content-title" class="form-control" placeholder="请输入内容标题(可选)">
+            </div>
+            
+            <div class="form-group is-public-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="is-public">
+                    <span class="checkbox-text">公开分享</span>
+                    <span class="checkbox-description">允许其他用户查看此内容</span>
+                </label>
+            </div>
+            
+            <div class="editor-container">
+                <!-- 不同类型内容的编辑区域 -->
+                <div id="markdown-editor-container">
+                    <textarea id="markdown-editor"></textarea>
+                </div>
+                
+                <div id="text-editor-container" style="display: none;">
+                    <textarea id="text-editor" class="text-editor" placeholder="请输入要分享的文本内容..."></textarea>
+                </div>
+                
+                <div id="preview-container" class="markdown-body hidden"></div>
+            </div>
+            
+            <div class="button-group">
+                <button class="button" id="toggle-preview"><i class="fas fa-eye"></i> 显示预览</button>
+                <button class="button primary-button" id="save-content"><i class="fas fa-save"></i> 保存修改</button>
+                <a href="/my-content" class="button"><i class="fas fa-arrow-left"></i> 返回</a>
+            </div>
+        </div>
+        
+        <div class="tips" id="markdown-tips">
+            <h3><i class="fas fa-lightbulb"></i> Markdown 小技巧</h3>
+            <ul>
+                <li><i class="fas fa-heading"></i> 使用 # 创建标题 (# 一级标题, ## 二级标题)</li>
+                <li><i class="fas fa-bold"></i> 使用 **文本** 或 __文本__ 来加粗文本</li>
+                <li><i class="fas fa-italic"></i> 使用 *文本* 或 _文本_ 来斜体显示</li>
+                <li><i class="fas fa-list-ul"></i> 使用 - 或 * 创建无序列表</li>
+                <li><i class="fas fa-list-ol"></i> 使用 1. 2. 3. 创建有序列表</li>
+                <li><i class="fas fa-link"></i> 插入链接: [链接文本](URL)</li>
+                <li><i class="fas fa-image"></i> 插入图片: ![替代文本](图片URL)</li>
+                <li><i class="fas fa-table"></i> 创建表格: | 表头 | 表头 | 然后下一行 | --- | --- |</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

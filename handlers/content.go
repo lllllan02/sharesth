@@ -1,9 +1,12 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
+	"html/template"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -188,4 +191,117 @@ func ContentDetailHandler(c *gin.Context) {
 
 	// 返回结果
 	c.JSON(http.StatusOK, result)
+}
+
+// EditContentPageHandler 显示编辑内容页面
+func EditContentPageHandler(c *gin.Context) {
+	// 获取客户端标识
+	clientIdentifier := data.GetClientIdentifier(c.Request)
+
+	// 获取内容ID
+	contentID := c.Param("contentID")
+	if contentID == "" {
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"title": "请求错误",
+			"error": "未提供内容ID",
+		})
+		return
+	}
+
+	// 加载内容
+	content, err := data.LoadContentBySource(contentID, clientIdentifier)
+	if err != nil {
+		c.HTML(http.StatusNotFound, "error.html", gin.H{
+			"title": "内容不存在",
+			"error": "找不到内容或您无权编辑",
+		})
+		return
+	}
+
+	// 验证内容类型，拒绝编辑图片内容
+	if content.Type == "image" {
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"title": "不支持的操作",
+			"error": "图片内容暂不支持编辑功能",
+		})
+		return
+	}
+
+	// 构建JSON格式的内容数据
+	contentData := map[string]interface{}{
+		"id":         content.ID,
+		"short_id":   content.ShortID,
+		"type":       content.Type,
+		"createTime": content.CreateTime,
+		"title":      content.Title,
+		"is_public":  content.IsPublic,
+		"content":    content.Data,
+	}
+
+	// 将内容数据转换为JSON字符串
+	jsonData, err := json.Marshal(contentData)
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"title": "服务器错误",
+			"error": "处理内容数据时出错",
+		})
+		return
+	}
+
+	// 渲染编辑页面
+	c.HTML(http.StatusOK, "edit.html", gin.H{
+		"content_json": template.JS(jsonData),
+	})
+}
+
+// UpdateContentHandler 处理更新内容的请求
+func UpdateContentHandler(c *gin.Context) {
+	// 获取客户端标识
+	clientIdentifier := data.GetClientIdentifier(c.Request)
+
+	// 获取内容ID
+	contentID := c.PostForm("content_id")
+	if contentID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "未提供内容ID"})
+		return
+	}
+
+	// 加载原有内容
+	content, err := data.LoadContentBySource(contentID, clientIdentifier)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "找不到内容或您无权编辑"})
+		return
+	}
+
+	// 验证内容类型，拒绝更新图片内容
+	if content.Type == "image" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "图片内容暂不支持编辑功能"})
+		return
+	}
+
+	// 获取内容数据
+	contentText := c.PostForm("content")
+	contentTitle := c.PostForm("title")
+	isPublic := c.PostForm("is_public") == "true"
+
+	// 更新内容
+	content.Data = contentText
+	if contentTitle != "" {
+		content.Title = contentTitle
+	}
+	content.IsPublic = isPublic
+	content.UpdateTime = time.Now() // 更新最后修改时间
+
+	// 保存更新
+	err = data.UpdateContent(&content)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "更新内容失败: " + err.Error()})
+		return
+	}
+
+	// 返回成功信息
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "内容已成功更新",
+	})
 }

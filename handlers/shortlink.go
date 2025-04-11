@@ -23,26 +23,44 @@ func ShortLinkHandler(c *gin.Context) {
 		return
 	}
 
+	// 获取当前访问者的客户端标识
+	clientIdentifier := data.GetClientIdentifier(c.Request)
+
+	// 判断当前用户是否是内容创建者
+	isOwner := content.Source == clientIdentifier
+
 	// 根据内容类型处理
 	switch content.Type {
 	case "markdown":
 		// 渲染Markdown内容页面
 		c.HTML(http.StatusOK, "markdown.html", gin.H{
-			"title":   content.Title,
-			"content": content.Data,
+			"title":      content.Title,
+			"content":    content.Data,
+			"createTime": content.CreateTime,
+			"updateTime": content.UpdateTime,
+			"isOwner":    isOwner,
+			"shortID":    content.ShortID,
 		})
 	case "text":
 		// 渲染纯文本内容页面，将换行符转换为<br>
 		htmlContent := strings.ReplaceAll(content.Data, "\n", "<br>")
 		c.HTML(http.StatusOK, "text.html", gin.H{
-			"title":   content.Title,
-			"content": htmlContent,
+			"title":      content.Title,
+			"content":    htmlContent,
+			"createTime": content.CreateTime,
+			"updateTime": content.UpdateTime,
+			"isOwner":    isOwner,
+			"shortID":    content.ShortID,
 		})
 	case "image":
 		// 渲染图片内容页面
 		c.HTML(http.StatusOK, "image.html", gin.H{
-			"title":     content.Title,
-			"imagePath": content.Data,
+			"title":      content.Title,
+			"imagePath":  content.Data,
+			"createTime": content.CreateTime,
+			"updateTime": content.UpdateTime,
+			"isOwner":    isOwner,
+			"shortID":    content.ShortID,
 		})
 	default:
 		c.String(http.StatusBadRequest, "不支持的内容类型")

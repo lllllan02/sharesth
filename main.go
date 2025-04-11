@@ -44,6 +44,9 @@ func main() {
 	r.GET("/api/my-content", handlers.MyContentAPIHandler)
 	r.POST("/api/toggle-visibility", handlers.ToggleContentVisibilityHandler)
 	r.POST("/api/delete-content", handlers.DeleteContentHandler)
+	r.GET("/api/content-detail", handlers.ContentDetailHandler)
+	r.GET("/edit/:contentID", handlers.EditContentPageHandler)   // 编辑内容页面
+	r.POST("/api/update-content", handlers.UpdateContentHandler) // 更新内容的API
 	r.GET("/search", handlers.SourceSearchPageHandler)
 	r.GET("/api/source-content", handlers.SourceContentHandler)
 	r.GET("/public", handlers.PublicContentPageHandler)

@@ -12,6 +12,7 @@ type Content struct {
 	Data       string    `json:"data" gorm:"type:text"`                // 文本内容或图片路径
 	Source     string    `json:"source" gorm:"type:varchar(10);index"` // 数据来源（客户端标识）
 	CreateTime time.Time `json:"create_time" gorm:"index"`             // 创建时间
+	UpdateTime time.Time `json:"update_time" gorm:"index"`             // 最后修改时间
 	Title      string    `json:"title" gorm:"type:varchar(255)"`       // 内容标题
 	IsPublic   bool      `json:"is_public" gorm:"default:false"`       // 是否公开，默认为不公开
 }

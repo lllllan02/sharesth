@@ -48,11 +48,14 @@
             <!-- 图片显示 -->
             <img src="{{ .imagePath }}" alt="{{ .title }}" class="image-display">
             
+            <!-- 时间信息 -->
+            <div class="content-meta-info">
+                <span class="meta-item"><i class="fas fa-clock"></i> 创建时间: {{.createTime.Format "2006-01-02 15:04:05"}}</span>
+            </div>
+            
             <!-- 操作按钮 -->
             <div class="image-actions">
-                <button class="button copy-button" id="copy-button"><i class="fas fa-copy"></i> 复制链接</button>
                 <a href="{{ .imagePath }}" download class="button download-button"><i class="fas fa-download"></i> 下载图片</a>
-                <a href="/" class="button"><i class="fas fa-home"></i> 回到首页</a>
             </div>
         </div>
     </div>

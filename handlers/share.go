@@ -33,11 +33,15 @@ func handleTextContent(c *gin.Context, contentType, clientIdentifier, title stri
 		}
 	}
 
+	// 设置当前时间
+	currentTime := time.Now()
+
 	content := models.Content{
 		Type:       contentType,
 		Data:       contentData,
 		Source:     clientIdentifier,
-		CreateTime: time.Now(),
+		CreateTime: currentTime,
+		UpdateTime: currentTime,
 		Title:      title,
 		IsPublic:   isPublic,
 	}
@@ -76,11 +80,15 @@ func handleImageContent(c *gin.Context, clientIdentifier, title string, isPublic
 		title = "图片: " + file.Filename
 	}
 
+	// 设置当前时间
+	currentTime := time.Now()
+
 	content := models.Content{
 		Type:       "image",
 		Data:       filepath, // 保存图片路径
 		Source:     clientIdentifier,
-		CreateTime: time.Now(),
+		CreateTime: currentTime,
+		UpdateTime: currentTime,
 		Title:      title,
 		IsPublic:   isPublic,
 	}

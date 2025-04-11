@@ -507,7 +507,42 @@ function renderContent(items) {
         
         metaDiv.appendChild(timeSpan);
         
-        // 4. 添加删除按钮
+        // 4. 添加编辑按钮
+        const editSpan = document.createElement('span');
+        
+        // 根据内容类型设置不同的样式和行为
+        if (item.type === 'image') {
+            // 图片内容的编辑按钮显示为禁用状态
+            editSpan.className = 'meta-item edit-item disabled';
+            editSpan.title = '图片内容暂不支持编辑';
+            editSpan.innerHTML = '<i class="fas fa-edit"></i>';
+            editSpan.style.cursor = 'not-allowed';
+            editSpan.style.opacity = '0.5';
+            
+            // 添加点击事件，显示提示
+            editSpan.addEventListener('click', function(e) {
+                e.stopPropagation();
+                showToast('图片内容暂不支持编辑功能', TOAST_TYPE.INFO);
+            });
+        } else {
+            // 文本/Markdown内容的编辑按钮正常显示
+            editSpan.className = 'meta-item edit-item';
+            editSpan.title = '编辑内容';
+            editSpan.innerHTML = '<i class="fas fa-edit"></i>';
+            editSpan.style.cursor = 'pointer';
+            editSpan.dataset.id = item.short_id;
+            editSpan.dataset.type = item.type;
+            
+            // 添加编辑事件监听
+            editSpan.addEventListener('click', function(e) {
+                e.stopPropagation();
+                editContent(this, item.short_id, item.type);
+            });
+        }
+        
+        metaDiv.appendChild(editSpan);
+        
+        // 5. 添加删除按钮
         const deleteSpan = document.createElement('span');
         deleteSpan.className = 'meta-item delete-item';
         deleteSpan.title = '删除内容';
@@ -686,4 +721,13 @@ window.copySourceId = function() {
                 }, 500);
             }
         });
-}; 
+};
+
+// 编辑内容
+function editContent(element, contentId, contentType) {
+    // 创建编辑页面URL
+    const editUrl = `/edit/${contentId}`;
+    
+    // 跳转到编辑页面
+    window.location.href = editUrl;
+} 

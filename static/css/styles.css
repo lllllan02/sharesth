@@ -1575,8 +1575,8 @@ button:hover, .button:hover, .search-button:hover {
     top: 50%;
     transform: translateY(-50%);
     height: 10px;
-    width: 1px;
-    background-color: #ddd;
+    width: 0;
+    background-color: transparent;
 }
 
 .meta-item i {
@@ -1959,4 +1959,54 @@ button:hover, .button:hover, .search-button:hover {
 
 #content-count {
     font-weight: 600;
+}
+
+/* 内容元数据信息样式 */
+.content-meta-info {
+    margin-top: 10px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    color: #607D8B;
+    font-size: 14px;
+    text-align: right;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.meta-item i {
+    color: #42A5F5;
+}
+
+/* 编辑链接样式 */
+.edit-link {
+    color: #607D8B;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.edit-link:hover {
+    color: #1976D2;
+    text-decoration: none;
+}
+
+.edit-link i {
+    color: #42A5F5;
+}
+
+.edit-button {
+    background-color: #4CAF50;
+}
+
+.edit-button:hover {
+    background-color: #388E3C;
 } 
