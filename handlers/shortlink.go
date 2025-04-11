@@ -3,11 +3,9 @@ package handlers
 import (
 	"log"
 	"net/http"
-	"strings"
+	"sharesth/data"
 
 	"github.com/gin-gonic/gin"
-
-	"sharesth/data"
 )
 
 // ShortLinkHandler 处理短链接访问
@@ -42,11 +40,9 @@ func ShortLinkHandler(c *gin.Context) {
 			"shortID":    content.ShortID,
 		})
 	case "text":
-		// 渲染纯文本内容页面，将换行符转换为<br>
-		htmlContent := strings.ReplaceAll(content.Data, "\n", "<br>")
 		c.HTML(http.StatusOK, "text.html", gin.H{
 			"title":      content.Title,
-			"content":    htmlContent,
+			"content":    content.Data,
 			"createTime": content.CreateTime,
 			"updateTime": content.UpdateTime,
 			"isOwner":    isOwner,
