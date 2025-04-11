@@ -46,12 +46,12 @@
         
         <div class="image-view-container">
             <!-- 图片显示 -->
-            <img src="{{ .ImagePath }}" alt="{{ .Title }}" class="image-display">
+            <img src="{{ .imagePath }}" alt="{{ .Title }}" class="image-display">
             
             <!-- 操作按钮 -->
             <div class="image-actions">
                 <button class="button copy-button" id="copy-button"><i class="fas fa-copy"></i> 复制链接</button>
-                <a href="{{ .ImagePath }}" download class="button download-button"><i class="fas fa-download"></i> 下载图片</a>
+                <a href="{{ .imagePath }}" download class="button download-button"><i class="fas fa-download"></i> 下载图片</a>
                 <a href="/" class="button"><i class="fas fa-home"></i> 回到首页</a>
             </div>
         </div>
