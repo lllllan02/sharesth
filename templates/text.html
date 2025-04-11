@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{if .Title}}{{.Title}}{{else}}分享内容{{end}} - SharedSTH</title>
+    <title>{{if .title}}{{.title}}{{else}}分享内容{{end}} - SharedSTH</title>
     
     <!-- 所有 CSS 和 JS 引用集中在这里 -->
     <!-- CSS 引用 -->
@@ -39,8 +39,8 @@
     <div class="container main-content">
         <div class="content-header">
             <div class="content-title-wrapper">
-                {{if .Title}}
-                <h1 id="title" class="content-title">{{.Title}}</h1>
+                {{if .title}}
+                <h1 id="title" class="content-title">{{.title}}</h1>
                 {{else}}
                 <h1 class="content-title">分享内容</h1>
                 {{end}}

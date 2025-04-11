@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ .Title }} - ShareSTH</title>
+    <title>{{ .title }} - ShareSTH</title>
     
     <!-- 所有 CSS 和 JS 引用集中在这里 -->
     <!-- CSS 引用 -->
@@ -39,14 +39,14 @@
     <div class="container main-content">
         <div class="content-header">
             <div class="content-title-wrapper">
-                <h1 class="content-title">{{ .Title }}</h1>
+                <h1 class="content-title">{{ .title }}</h1>
                 <span class="content-type-badge"><i class="fas fa-image"></i></span>
             </div>
         </div>
         
         <div class="image-view-container">
             <!-- 图片显示 -->
-            <img src="{{ .imagePath }}" alt="{{ .Title }}" class="image-display">
+            <img src="{{ .imagePath }}" alt="{{ .title }}" class="image-display">
             
             <!-- 操作按钮 -->
             <div class="image-actions">
