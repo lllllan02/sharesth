@@ -134,8 +134,8 @@ func ShareHandler(c *gin.Context) {
 		return
 	}
 
-	// 生成短链接
-	shortID := utils.GenerateShortID(6)
+	// 生成短链接ID并保存内容
+	shortID := utils.GenerateShortID(8)
 
 	// 保存内容到数据库
 	if err := models.SaveContent(shortID, content); err != nil {

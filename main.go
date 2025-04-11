@@ -9,16 +9,18 @@ import (
 
 	"sharesth/handlers"
 	"sharesth/models"
+	"sharesth/utils"
 )
 
 func main() {
-	// 初始化数据库连接
+	// 初始化数据库
 	if err := models.InitDB(); err != nil {
-		log.Fatalf("初始化数据库失败: %v", err)
+		log.Fatalf("数据库初始化失败: %v", err)
 	}
-
-	// 获取sqlDB以便在程序结束时关闭
 	defer models.CloseDB()
+
+	// 加载已分配的用户ID到内存
+	utils.LoadAllocatedUserIDs()
 
 	// 创建Gin路由
 	r := gin.Default()
