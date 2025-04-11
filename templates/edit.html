@@ -39,6 +39,8 @@
     <script>
         // 注入内容数据供JS使用
         var contentData = {{.content_json}};
+        // 保存referer信息供JS使用
+        var refererUrl = "{{if .referer}}{{.referer}}{{else}}/my-content{{end}}";
     </script>
     
     <!-- 引入页面专用JS -->
@@ -95,7 +97,7 @@
             <div class="button-group">
                 <button class="button" id="toggle-preview"><i class="fas fa-eye"></i> 显示预览</button>
                 <button class="button primary-button" id="save-content"><i class="fas fa-save"></i> 保存修改</button>
-                <a href="/my-content" class="button"><i class="fas fa-arrow-left"></i> 返回</a>
+                <a href="{{if .referer}}{{.referer}}{{else}}/my-content{{end}}" class="button" id="return-button"><i class="fas fa-arrow-left"></i> 返回</a>
             </div>
         </div>
         

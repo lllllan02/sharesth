@@ -208,6 +208,9 @@ func EditContentPageHandler(c *gin.Context) {
 		return
 	}
 
+	// 获取来源页面URL
+	referer := c.Request.Header.Get("Referer")
+
 	// 加载内容
 	content, err := data.LoadContentBySource(contentID, clientIdentifier)
 	if err != nil {
@@ -251,6 +254,7 @@ func EditContentPageHandler(c *gin.Context) {
 	// 渲染编辑页面
 	c.HTML(http.StatusOK, "edit.html", gin.H{
 		"content_json": template.JS(jsonData),
+		"referer":      referer, // 传递来源页面URL
 	})
 }
 

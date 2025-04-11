@@ -4,6 +4,7 @@
 let easyMDE = null;  // Markdown编辑器实例
 let contentType = ''; // 内容类型
 let contentId = ''; // 内容ID
+let refererUrl = ''; // 来源URL
 
 // 页面加载后执行
 document.addEventListener('DOMContentLoaded', function() {
@@ -28,6 +29,9 @@ function initContent() {
     // 设置全局变量
     contentId = contentData.short_id;
     contentType = contentData.type;
+    
+    // 获取从模板传递的referer值
+    refererUrl = window.refererUrl || '/my-content';
     
     // 设置标题
     document.getElementById('content-title').value = contentData.title || '';
@@ -235,10 +239,21 @@ function saveContent() {
             // 显示成功消息
             showToast(data.message || '内容已成功保存', TOAST_TYPE.SUCCESS);
             
-            // 延迟跳转到内容页面
-            setTimeout(() => {
-                window.location.href = `/${contentId}`;
-            }, 1500);
+            // 确定返回的URL
+            let returnUrl = refererUrl;
+            
+            // 检查返回URL是否是详情页(/shortID)
+            if (returnUrl && returnUrl.match(/\/[A-Za-z0-9]{8}(?:\?.*)?$/)) {
+                // 如果来源是详情页，那么返回到那里
+                setTimeout(() => {
+                    window.location.href = returnUrl;
+                }, 1500);
+            } else {
+                // 否则返回到内容详情页
+                setTimeout(() => {
+                    window.location.href = `/${contentId}`;
+                }, 1500);
+            }
         } else {
             // 显示错误消息
             throw new Error(data.error || '保存失败，请重试');
@@ -250,6 +265,6 @@ function saveContent() {
         button.innerHTML = originalHTML;
         
         // 显示错误消息
-        showToast(error.message, TOAST_TYPE.ERROR);
+        showToast(error.message || '保存失败，请重试', TOAST_TYPE.ERROR);
     });
 }
