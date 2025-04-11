@@ -19,6 +19,10 @@ func main() {
 	}
 	defer models.CloseDB()
 
+	// 初始化Redis客户端
+	utils.InitRedisClient()
+	defer utils.CloseRedisClient()
+
 	// 加载已分配的用户ID到内存
 	utils.LoadAllocatedUserIDs()
 

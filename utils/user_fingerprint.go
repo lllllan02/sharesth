@@ -40,13 +40,21 @@ func GetClientIdentifier(r *http.Request) string {
 	// 第一步：提取浏览器特征并生成哈希
 	browserHash, browserInfo := extractBrowserFingerprint(r)
 
-	// 第二步：检查数据库中是否已存在此浏览器的用户ID
-	if userID, found := models.FindUserIDByBrowserHash(browserHash); found {
-		log.Printf("找到已存在的用户ID: %s", userID)
+	// 第二步：先从Redis缓存中查找
+	if userID, found := GetUserIDFromRedis(browserHash); found {
+		log.Printf("从Redis缓存中找到用户ID: %s", userID)
 		return userID
 	}
 
-	// 第三步：生成新的用户ID
+	// 第三步：如果Redis中没有，查询数据库
+	if userID, found := models.FindUserIDByBrowserHash(browserHash); found {
+		log.Printf("从数据库中找到用户ID: %s", userID)
+		// 找到后，写入Redis缓存
+		SaveUserIDToRedis(browserHash, userID)
+		return userID
+	}
+
+	// 第四步：Redis和数据库中都没有，生成新的用户ID
 	return generateAndSaveUserID(browserHash, browserInfo)
 }
 
@@ -178,6 +186,9 @@ func allocateAndSaveUserID(userID string, browserHash string, browserInfo string
 		} else {
 			log.Printf("为浏览器分配新用户ID: %s", userID)
 		}
+
+		// 同时保存到Redis缓存
+		SaveUserIDToRedis(browserHash, userID)
 	}
 
 	return userID
@@ -209,6 +220,8 @@ func generateFallbackUserID(browserHash string, browserInfo string) string {
 				log.Printf("保存用户指纹信息失败: %v", err)
 			} else {
 				log.Printf("所有长度尝试失败，生成最终随机用户ID: %s", randomID)
+				// 同时保存到Redis缓存
+				SaveUserIDToRedis(browserHash, randomID)
 			}
 
 			return randomID
@@ -221,6 +234,8 @@ func generateFallbackUserID(browserHash string, browserInfo string) string {
 	allocatedUserIDs[finalID] = true
 
 	models.SaveUserFingerprint(browserHash, finalID, browserInfo)
+	// 同时保存到Redis缓存
+	SaveUserIDToRedis(browserHash, finalID)
 	log.Printf("生成基于时间戳的最终用户ID: %s", finalID)
 
 	return finalID
