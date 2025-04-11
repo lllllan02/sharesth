@@ -1,4 +1,4 @@
-package models
+package data
 
 import (
 	"fmt"
@@ -10,6 +10,8 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+
+	"sharesth/models"
 )
 
 var DB *gorm.DB
@@ -45,18 +47,14 @@ func InitDB() error {
 		return fmt.Errorf("连接数据库失败: %v", err)
 	}
 
-	// 注意：Content中的字段长度已经变更
-	// ShortID: varchar(10) -> varchar(15)，分享ID长度从6位增加到8位
-	// Source: varchar(100) -> varchar(10)，用户标识从12位缩短到5位
-	log.Println("开始自动迁移数据库，ShortID字段长度已延长，Source字段长度已缩短为5位字符")
-
 	// 自动迁移数据库表结构
-	err = DB.AutoMigrate(&Content{}, &FileMD5{}, &UserFingerprint{})
+	err = DB.AutoMigrate(&models.Content{}, &models.FileMD5{}, &models.UserFingerprint{})
 	if err != nil {
 		return fmt.Errorf("数据库迁移失败: %v", err)
 	}
 
 	log.Println("数据库连接和迁移成功")
+
 	return nil
 }
 

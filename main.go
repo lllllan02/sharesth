@@ -7,24 +7,24 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"sharesth/data"
 	"sharesth/handlers"
-	"sharesth/models"
 	"sharesth/utils"
 )
 
 func main() {
 	// 初始化数据库
-	if err := models.InitDB(); err != nil {
+	if err := data.InitDB(); err != nil {
 		log.Fatalf("数据库初始化失败: %v", err)
 	}
-	defer models.CloseDB()
+	defer data.CloseDB()
 
 	// 初始化Redis客户端
-	utils.InitRedisClient()
-	defer utils.CloseRedisClient()
+	data.InitRedisClient()
+	defer data.CloseRedisClient()
 
 	// 加载已分配的用户ID到内存
-	utils.LoadAllocatedUserIDs()
+	data.LoadAllocatedUserIDs()
 
 	// 创建Gin路由
 	r := gin.Default()
@@ -51,7 +51,7 @@ func main() {
 	r.GET("/:shortID", handlers.ShortLinkHandler)
 
 	// 确保上传目录存在
-	os.MkdirAll("uploads", 0755)
+	os.MkdirAll(utils.UploadsDir, 0755)
 
 	// 启动服务器
 	port := os.Getenv("PORT")

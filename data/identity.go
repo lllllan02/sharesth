@@ -1,4 +1,4 @@
-package utils
+package data
 
 import (
 	"crypto/md5"
@@ -10,13 +10,42 @@ import (
 	"strings"
 	"sync"
 	"time"
+)
 
-	"sharesth/models"
+// ID长度相关常量
+const (
+	// 默认用户ID长度
+	DefaultUserIDLength = 4
+	// 建议的用户ID最大长度（不是硬性限制）
+	MaxUserIDLength = 8
+	// 同一长度下最大重试次数
+	MaxRetryAtSameLength = 5
 )
 
 // 全局变量，用于记录已分配的ID，防止重复
 var allocatedUserIDs = make(map[string]bool)
 var userIDMutex = &sync.Mutex{}
+
+// FilterEmpty 过滤空字符串
+func FilterEmpty(strs []string) []string {
+	var result []string
+	for _, s := range strs {
+		if s != "" {
+			result = append(result, s)
+		}
+	}
+	return result
+}
+
+// SimpleHash 简单哈希函数，与前端JavaScript的哈希算法相似
+func SimpleHash(s string) uint32 {
+	var total uint32 = 0
+	for i := 0; i < len(s); i++ {
+		// 使用相同的算法：total = total * 31 + char
+		total = (total*31 + uint32(s[i])) & 0xFFFFFFFF
+	}
+	return total
+}
 
 // LoadAllocatedUserIDs 从数据库加载已分配的用户ID
 func LoadAllocatedUserIDs() {
@@ -27,7 +56,7 @@ func LoadAllocatedUserIDs() {
 	allocatedUserIDs = make(map[string]bool)
 
 	// 加载已分配的ID
-	ids := models.GetAllAllocatedUserIDs()
+	ids := GetAllAllocatedUserIDs()
 	for id := range ids {
 		allocatedUserIDs[id] = true
 	}
@@ -47,10 +76,8 @@ func GetClientIdentifier(r *http.Request) string {
 	}
 
 	// 第三步：如果Redis中没有，查询数据库
-	if userID, found := models.FindUserIDByBrowserHash(browserHash); found {
+	if userID, found := FindUserIDByBrowserHash(browserHash); found {
 		log.Printf("从数据库中找到用户ID: %s", userID)
-		// 找到后，写入Redis缓存
-		SaveUserIDToRedis(browserHash, userID)
 		return userID
 	}
 
@@ -73,7 +100,7 @@ func extractBrowserFingerprint(r *http.Request) (string, string) {
 	}
 
 	// 过滤掉空值并用特殊分隔符连接
-	identifierSource := strings.Join(filterEmpty(stableParams), "###")
+	identifierSource := strings.Join(FilterEmpty(stableParams), "###")
 
 	// 用于浏览器特征的详细描述
 	browserInfo := fmt.Sprintf("UA: %s, Lang: %s, Sec-Ch-Ua: %s",
@@ -176,7 +203,7 @@ func allocateAndSaveUserID(userID string, browserHash string, browserInfo string
 	allocatedUserIDs[userID] = true
 
 	// 将用户ID与浏览器特征关联保存到数据库
-	err := models.SaveUserFingerprint(browserHash, userID, browserInfo)
+	err := SaveUserFingerprint(browserHash, userID, browserInfo)
 	if err != nil {
 		log.Printf("保存用户指纹信息失败: %v", err)
 		// 即使保存失败也继续使用生成的ID
@@ -186,9 +213,6 @@ func allocateAndSaveUserID(userID string, browserHash string, browserInfo string
 		} else {
 			log.Printf("为浏览器分配新用户ID: %s", userID)
 		}
-
-		// 同时保存到Redis缓存
-		SaveUserIDToRedis(browserHash, userID)
 	}
 
 	return userID
@@ -215,13 +239,11 @@ func generateFallbackUserID(browserHash string, browserInfo string) string {
 			allocatedUserIDs[randomID] = true
 
 			// 保存到数据库
-			err := models.SaveUserFingerprint(browserHash, randomID, browserInfo)
+			err := SaveUserFingerprint(browserHash, randomID, browserInfo)
 			if err != nil {
 				log.Printf("保存用户指纹信息失败: %v", err)
 			} else {
 				log.Printf("所有长度尝试失败，生成最终随机用户ID: %s", randomID)
-				// 同时保存到Redis缓存
-				SaveUserIDToRedis(browserHash, randomID)
 			}
 
 			return randomID
@@ -233,9 +255,7 @@ func generateFallbackUserID(browserHash string, browserInfo string) string {
 	finalID := timeComponent[:MaxUserIDLength]
 	allocatedUserIDs[finalID] = true
 
-	models.SaveUserFingerprint(browserHash, finalID, browserInfo)
-	// 同时保存到Redis缓存
-	SaveUserIDToRedis(browserHash, finalID)
+	SaveUserFingerprint(browserHash, finalID, browserInfo)
 	log.Printf("生成基于时间戳的最终用户ID: %s", finalID)
 
 	return finalID

@@ -3,7 +3,7 @@ package handlers
 import (
 	"net/http"
 	"path/filepath"
-	"sharesth/utils"
+	"sharesth/data"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -44,7 +44,7 @@ func UploadImageForMD(c *gin.Context) {
 	defer src.Close()
 
 	// 使用SaveUploadedImage保存文件并实现去重
-	filepath, err := utils.SaveUploadedImage(src, file.Filename)
+	filepath, err := data.SaveUploadedImage(src, file.Filename)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,

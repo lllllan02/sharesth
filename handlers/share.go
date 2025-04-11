@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"sharesth/data"
 	"sharesth/models"
 	"sharesth/utils"
 )
@@ -65,7 +66,7 @@ func handleImageContent(c *gin.Context, clientIdentifier, title string, isPublic
 	defer src.Close()
 
 	// 使用SaveUploadedImage保存文件并实现去重
-	filepath, err := utils.SaveUploadedImage(src, file.Filename)
+	filepath, err := data.SaveUploadedImage(src, file.Filename)
 	if err != nil {
 		return models.Content{}, fmt.Errorf("保存图片失败: %v", err)
 	}
@@ -90,7 +91,7 @@ func handleImageContent(c *gin.Context, clientIdentifier, title string, isPublic
 // ShareHandler 处理内容分享
 func ShareHandler(c *gin.Context) {
 	// 获取客户端标识
-	clientIdentifier := utils.GetClientIdentifier(c.Request)
+	clientIdentifier := data.GetClientIdentifier(c.Request)
 
 	// 获取内容类型
 	contentType := c.PostForm("type")
@@ -138,7 +139,7 @@ func ShareHandler(c *gin.Context) {
 	shortID := utils.GenerateShortID(8)
 
 	// 保存内容到数据库
-	if err := models.SaveContent(shortID, content); err != nil {
+	if err := data.SaveContent(shortID, content); err != nil {
 		log.Printf("保存内容失败: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "保存内容失败"})
 		return

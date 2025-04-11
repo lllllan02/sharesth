@@ -2,10 +2,11 @@ package handlers
 
 import (
 	"net/http"
-	"sharesth/models"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+
+	"sharesth/data"
 )
 
 // SourceSearchPageHandler 显示查询用户分享记录页面
@@ -44,7 +45,7 @@ func SourceContentHandler(c *gin.Context) {
 	typeFilter := c.Query("type")
 
 	// 获取总记录数、分页数据和类型统计
-	total, results, typeCounts := models.FindContentsBySourcePaginated(source, query, typeFilter, page, perPage)
+	total, results, typeCounts := data.FindContentsBySourcePaginated(source, query, typeFilter, page, perPage)
 
 	// 返回JSON结果
 	c.JSON(http.StatusOK, gin.H{
@@ -88,7 +89,7 @@ func SourceSearchAPIHandler(c *gin.Context) {
 	typeFilter := c.Query("type")
 
 	// 获取总记录数、分页数据和类型统计
-	total, results, typeCounts := models.FindContentsBySourcePaginated(source, query, typeFilter, page, perPage)
+	total, results, typeCounts := data.FindContentsBySourcePaginated(source, query, typeFilter, page, perPage)
 
 	// 返回JSON结果
 	c.JSON(http.StatusOK, gin.H{

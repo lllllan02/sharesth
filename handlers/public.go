@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"sharesth/models"
+	"sharesth/data"
 )
 
 // PublicContentPageHandler 显示公开内容页面
@@ -35,7 +35,7 @@ func PublicContentAPIHandler(c *gin.Context) {
 	query := c.Query("query")
 
 	// 获取总记录数和分页数据
-	total, results := models.FindPublicContentsPaginated(query, page, perPage)
+	total, results := data.FindPublicContentsPaginated(query, page, perPage)
 
 	// 返回JSON结果
 	c.JSON(http.StatusOK, gin.H{

@@ -7,8 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"sharesth/models"
-	"sharesth/utils"
+	"sharesth/data"
 )
 
 // MyContentPageHandler 显示当前用户内容页面
@@ -19,7 +18,7 @@ func MyContentPageHandler(c *gin.Context) {
 // MyContentAPIHandler 返回当前用户内容的JSON数据
 func MyContentAPIHandler(c *gin.Context) {
 	// 获取客户端标识
-	clientIdentifier := utils.GetClientIdentifier(c.Request)
+	clientIdentifier := data.GetClientIdentifier(c.Request)
 
 	// 获取分页参数
 	page := 1
@@ -43,7 +42,7 @@ func MyContentAPIHandler(c *gin.Context) {
 	typeFilter := c.Query("type")
 
 	// 获取总记录数、分页数据和类型统计
-	total, results, typeCounts := models.FindContentsBySourcePaginated(clientIdentifier, query, typeFilter, page, perPage)
+	total, results, typeCounts := data.FindContentsBySourcePaginated(clientIdentifier, query, typeFilter, page, perPage)
 
 	// 返回JSON结果
 	c.JSON(http.StatusOK, gin.H{
@@ -59,7 +58,7 @@ func MyContentAPIHandler(c *gin.Context) {
 // ToggleContentVisibilityHandler 切换内容的公开/隐藏状态
 func ToggleContentVisibilityHandler(c *gin.Context) {
 	// 获取客户端标识
-	clientIdentifier := utils.GetClientIdentifier(c.Request)
+	clientIdentifier := data.GetClientIdentifier(c.Request)
 
 	// 获取内容ID
 	contentID := c.PostForm("content_id")
@@ -69,9 +68,8 @@ func ToggleContentVisibilityHandler(c *gin.Context) {
 	}
 
 	// 获取当前用户拥有的内容
-	var content models.Content
-	result := models.DB.Where("short_id = ? AND source = ?", contentID, clientIdentifier).First(&content)
-	if result.Error != nil {
+	content, err := data.LoadContentBySource(contentID, clientIdentifier)
+	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "内容不存在或您无权修改"})
 		return
 	}
@@ -80,8 +78,8 @@ func ToggleContentVisibilityHandler(c *gin.Context) {
 	content.IsPublic = !content.IsPublic
 
 	// 保存更改
-	result = models.DB.Save(&content)
-	if result.Error != nil {
+	err = data.UpdateContent(&content)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "更新内容状态失败"})
 		return
 	}
@@ -102,7 +100,7 @@ func ToggleContentVisibilityHandler(c *gin.Context) {
 // DeleteContentHandler 处理删除内容的请求
 func DeleteContentHandler(c *gin.Context) {
 	// 获取客户端标识
-	clientIdentifier := utils.GetClientIdentifier(c.Request)
+	clientIdentifier := data.GetClientIdentifier(c.Request)
 
 	// 获取内容ID
 	contentID := c.PostForm("content_id")
@@ -112,7 +110,7 @@ func DeleteContentHandler(c *gin.Context) {
 	}
 
 	// 删除内容
-	err := models.DeleteContent(contentID, clientIdentifier)
+	err := data.DeleteContent(contentID, clientIdentifier)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
