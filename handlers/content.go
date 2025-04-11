@@ -66,8 +66,12 @@ func ToggleContentVisibilityHandler(c *gin.Context) {
 	// 获取内容ID
 	contentID := c.PostForm("content_id")
 	if contentID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "未提供内容ID"})
-		return
+		// 尝试从URL参数获取
+		contentID = c.Query("content_id")
+		if contentID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "未提供内容ID"})
+			return
+		}
 	}
 
 	// 获取当前用户拥有的内容
@@ -108,8 +112,12 @@ func DeleteContentHandler(c *gin.Context) {
 	// 获取内容ID
 	contentID := c.PostForm("content_id")
 	if contentID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "未提供内容ID"})
-		return
+		// 尝试从URL参数获取
+		contentID = c.Query("content_id")
+		if contentID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "未提供内容ID"})
+			return
+		}
 	}
 
 	// 删除内容
@@ -263,11 +271,15 @@ func UpdateContentHandler(c *gin.Context) {
 	// 获取客户端标识
 	clientIdentifier := data.GetClientIdentifier(c.Request)
 
-	// 获取内容ID
+	// 获取内容ID - 从请求体获取
 	contentID := c.PostForm("content_id")
 	if contentID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "未提供内容ID"})
-		return
+		// 尝试从URL参数获取
+		contentID = c.Query("content_id")
+		if contentID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "未提供内容ID"})
+			return
+		}
 	}
 
 	// 加载原有内容

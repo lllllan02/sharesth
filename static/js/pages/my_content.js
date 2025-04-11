@@ -80,8 +80,8 @@ function fetchContentPage(page) {
     // 记录请求参数用于调试
     console.log('API请求参数:', params.toString());
     
-    // 发送请求
-    fetch(`/api/my-content?${params.toString()}`, {
+    // 发送请求 - 使用新的API路径
+    fetch(`/api/contents?${params.toString()}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json'
@@ -583,9 +583,9 @@ function deleteContent(element, contentId) {
             const formData = new FormData();
             formData.append('content_id', contentId);
             
-            // 发送删除请求
-            fetch('/api/delete-content', {
-                method: 'POST',
+            // 发送删除请求 - 使用新的API路径
+            fetch('/api/contents', {
+                method: 'DELETE',
                 body: formData
             })
             .then(response => {
@@ -643,13 +643,13 @@ function loadContentPreview(button, contentId, summaryDiv) {
         return;
     }
     
-    // 构建查询参数 - 使用my-content接口
+    // 构建查询参数 - 使用新的API路径
     const params = new URLSearchParams();
     params.append('page', '1');
     params.append('per_page', '50');
     
     // 发送请求获取内容
-    fetch(`/api/my-content?${params.toString()}`, {
+    fetch(`/api/contents?${params.toString()}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json'
@@ -662,41 +662,42 @@ function loadContentPreview(button, contentId, summaryDiv) {
         return response.json();
     })
     .then(data => {
-        console.log('获取到内容列表:', data);
-        
-        // 在items中查找对应ID的内容
-        const contentItem = data.items.find(item => item.short_id === contentId);
-        
-        if (!contentItem) {
-            throw new Error('未找到指定的内容');
+        // 处理返回的数据
+        if (!data || !data.items || !Array.isArray(data.items)) {
+            throw new Error('获取内容列表失败: 无效的数据格式');
         }
         
-        // 使用摘要字段
-        let previewText = contentItem.summary || '';
-        
-        if (!previewText) {
-            throw new Error('未找到可预览内容');
+        // 查找对应的内容
+        const targetContent = data.items.find(item => item.short_id === contentId);
+        if (!targetContent) {
+            throw new Error('未找到指定内容');
         }
         
-        // 如果是Markdown，简化处理
-        if (contentItem.type === 'markdown') {
-            previewText = simplifyMarkdown(previewText);
+        // 获取内容摘要
+        let summary = '';
+        if (targetContent.type === 'markdown' || targetContent.type === 'text') {
+            summary = targetContent.summary || '无内容预览';
+        } else if (targetContent.type === 'image') {
+            // 对于图片，显示图片预览
+            summaryDiv.innerHTML = `<img src="${targetContent.thumbnail_url}" alt="图片预览" class="preview-image">`;
+            // 隐藏按钮，任务完成
+            button.style.display = 'none';
+            return;
         }
         
-        // 更新预览内容
-        summaryDiv.textContent = previewText;
+        // 更新摘要内容
+        summaryDiv.textContent = summary;
         
-        // 隐藏按钮
+        // 隐藏按钮，任务完成
         button.style.display = 'none';
-        
-        // 显示成功提示
-        showToast('已加载内容预览', TOAST_TYPE.INFO);
     })
     .catch(error => {
-        console.error('Error:', error);
-        button.innerHTML = '<i class="fas fa-exclamation-circle"></i> 加载失败，点击重试';
+        console.error('加载内容预览错误:', error);
+        summaryDiv.textContent = '加载内容预览失败: ' + error.message;
+        
+        // 恢复按钮状态，允许再次尝试
         button.disabled = false;
-        showToast('加载预览失败: ' + error.message, TOAST_TYPE.ERROR);
+        button.innerHTML = '加载内容预览';
     });
 }
 
@@ -725,8 +726,8 @@ window.copySourceId = function() {
 
 // 编辑内容
 function editContent(element, contentId, contentType) {
-    // 创建编辑页面URL
-    const editUrl = `/edit/${contentId}`;
+    // 创建编辑页面URL - 使用新路径
+    const editUrl = `/contents/edit/${contentId}`;
     
     // 跳转到编辑页面
     window.location.href = editUrl;

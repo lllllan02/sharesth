@@ -228,7 +228,8 @@ function initTooltips() {
 
 // 内容分享功能
 function uploadContent(formData, button, originalHTML) {
-    fetch('/share', {
+    // 使用新的API路径
+    fetch('/api/contents', {
         method: 'POST',
         body: formData
     })
@@ -268,50 +269,32 @@ function uploadContent(formData, button, originalHTML) {
         isPublicCheckbox.parentElement.style.cursor = 'not-allowed';
         
         const activeContent = document.querySelector('.content:not(.hidden)');
-        if (activeContent.id === 'markdown-content') {
-            // 禁用Markdown编辑器
+        
+        // 根据内容类型禁用不同的元素
+        if (contentType === 'markdown') {
             if (window.easyMDE) {
                 window.easyMDE.codemirror.setOption('readOnly', true);
+                document.querySelector('.editor-toolbar').style.display = 'none';
             }
-            
-            // 禁用Markdown编辑器工具栏
-            document.querySelectorAll('.editor-toolbar button, .editor-toolbar a').forEach(btn => {
-                btn.classList.add('disabled');
-                btn.style.opacity = '0.5';
-                btn.style.pointerEvents = 'none';
-            });
-            
-            // 禁用分享按钮
-            document.getElementById('share-md').disabled = true;
-            document.getElementById('share-md').style.opacity = '0.5';
-            document.getElementById('share-md').style.pointerEvents = 'none';
-            
-            // 禁用预览切换
-            document.getElementById('toggle-preview').style.opacity = '0.5';
-            document.getElementById('toggle-preview').style.pointerEvents = 'none';
-            
-        } else if (activeContent.id === 'text-content') {
-            document.getElementById('text-editor').setAttribute('readonly', 'readonly');
-            
-            // 禁用文本分享按钮
-            document.getElementById('share-text').disabled = true;
-            document.getElementById('share-text').style.opacity = '0.5';
-            document.getElementById('share-text').style.pointerEvents = 'none';
-            
-        } else if (activeContent.id === 'image-content') {
-            // 禁用图片分享按钮
-            document.getElementById('share-image').disabled = true;
-            document.getElementById('share-image').style.opacity = '0.5';
-            document.getElementById('share-image').style.pointerEvents = 'none';
+        } else if (contentType === 'text') {
+            document.getElementById('text-content').setAttribute('readonly', 'readonly');
+        } else if (contentType === 'image') {
+            document.getElementById('image-selector').style.display = 'none';
         }
         
-        // 重置按钮
-        resetButton(button, originalHTML);
+        // 隐藏分享按钮，显示返回或创建新内容按钮
+        button.style.display = 'none';
+        document.getElementById('new-btn').style.display = 'inline-block';
     })
     .catch(error => {
-        console.error('上传失败:', error);
-        showToast('上传失败: ' + error.message, TOAST_TYPE.ERROR);
-        resetButton(button, originalHTML);
+        console.error('Error:', error);
+        
+        // 恢复按钮状态
+        button.disabled = false;
+        button.innerHTML = originalHTML;
+        
+        // 显示错误消息
+        showToast(`分享失败: ${error.message}`, TOAST_TYPE.ERROR);
     });
 }
 
@@ -324,9 +307,9 @@ function toggleContentVisibility(element, contentId) {
     const formData = new FormData();
     formData.append('content_id', contentId);
     
-    // 发送请求
-    fetch('/api/toggle-visibility', {
-        method: 'POST',
+    // 发送请求 - 使用新的API路径
+    fetch('/api/contents/visibility', {
+        method: 'PATCH',
         body: formData
     })
     .then(response => response.json())

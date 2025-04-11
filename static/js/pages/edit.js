@@ -219,9 +219,9 @@ function saveContent() {
     }
     formData.append('is_public', isPublic ? 'true' : 'false');
     
-    // 发送更新请求
-    fetch('/api/update-content', {
-        method: 'POST',
+    // 发送更新请求 - 使用新的API路径
+    fetch('/api/contents', {
+        method: 'PUT',
         body: formData
     })
     .then(response => {
@@ -251,7 +251,7 @@ function saveContent() {
             } else {
                 // 否则返回到内容详情页
                 setTimeout(() => {
-                    window.location.href = `/${contentId}`;
+                    window.location.href = `${contentId}`;
                 }, 1500);
             }
         } else {

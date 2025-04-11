@@ -38,6 +38,7 @@ func ShortLinkHandler(c *gin.Context) {
 			"updateTime": content.UpdateTime,
 			"isOwner":    isOwner,
 			"shortID":    content.ShortID,
+			"shortLink":  content.ShortID,
 		})
 	case "text":
 		c.HTML(http.StatusOK, "text.html", gin.H{
@@ -47,6 +48,7 @@ func ShortLinkHandler(c *gin.Context) {
 			"updateTime": content.UpdateTime,
 			"isOwner":    isOwner,
 			"shortID":    content.ShortID,
+			"shortLink":  content.ShortID,
 		})
 	case "image":
 		// 渲染图片内容页面
@@ -57,6 +59,7 @@ func ShortLinkHandler(c *gin.Context) {
 			"updateTime": content.UpdateTime,
 			"isOwner":    isOwner,
 			"shortID":    content.ShortID,
+			"shortLink":  content.ShortID,
 		})
 	default:
 		c.String(http.StatusBadRequest, "不支持的内容类型")

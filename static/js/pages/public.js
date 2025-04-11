@@ -92,8 +92,8 @@ function fetchPublicContent(page) {
         params.append('query', searchTerm);
     }
     
-    // 发送请求
-    fetch(`/api/public-content?${params.toString()}`)
+    // 发送请求 - 使用新的API路径
+    fetch(`/api/contents/public?${params.toString()}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('获取数据失败');

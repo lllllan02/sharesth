@@ -58,7 +58,7 @@ func FindContentsBySource(source string) []map[string]interface{} {
 			"short_id":   content.ShortID,
 			"type":       content.Type,
 			"createTime": content.CreateTime,
-			"link":       "/" + content.ShortID,
+			"link":       content.ShortID,
 			"title":      content.Title,
 			"is_public":  content.IsPublic,
 		}
@@ -100,7 +100,7 @@ func FindPublicContents() []map[string]interface{} {
 			"short_id":   content.ShortID,
 			"type":       content.Type,
 			"createTime": content.CreateTime,
-			"link":       "/" + content.ShortID,
+			"link":       content.ShortID,
 			"title":      content.Title,
 		}
 
@@ -177,7 +177,7 @@ func FindContentsBySourcePaginated(source string, query string, typeFilter strin
 			"short_id":   content.ShortID,
 			"type":       content.Type,
 			"createTime": content.CreateTime,
-			"link":       "/" + content.ShortID,
+			"link":       content.ShortID,
 			"title":      content.Title,
 			"is_public":  content.IsPublic,
 		}
@@ -255,7 +255,7 @@ func FindPublicContentsPaginated(query string, typeFilter string, page int, perP
 			"short_id":   content.ShortID,
 			"type":       content.Type,
 			"createTime": content.CreateTime,
-			"link":       "/" + content.ShortID,
+			"link":       content.ShortID,
 			"title":      content.Title,
 		}
 

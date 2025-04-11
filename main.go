@@ -36,22 +36,33 @@ func main() {
 	// 加载HTML模板
 	r.LoadHTMLGlob("templates/*.html")
 
-	// 路由配置
-	r.GET("/", handlers.IndexHandler)
-	r.POST("/share", handlers.ShareHandler)
-	r.POST("/upload/image", handlers.UploadImageForMD) // Markdown编辑器的图片上传
-	r.GET("/my-content", handlers.MyContentPageHandler)
-	r.GET("/api/my-content", handlers.MyContentAPIHandler)
-	r.POST("/api/toggle-visibility", handlers.ToggleContentVisibilityHandler)
-	r.POST("/api/delete-content", handlers.DeleteContentHandler)
-	r.GET("/api/content-detail", handlers.ContentDetailHandler)
-	r.GET("/edit/:contentID", handlers.EditContentPageHandler)   // 编辑内容页面
-	r.POST("/api/update-content", handlers.UpdateContentHandler) // 更新内容的API
-	r.GET("/search", handlers.SourceSearchPageHandler)
-	r.GET("/api/source-content", handlers.SourceContentHandler)
-	r.GET("/public", handlers.PublicContentPageHandler)
-	r.GET("/api/public-content", handlers.PublicContentAPIHandler)
+	// 前端页面路由
+	r.GET("/", handlers.IndexHandler)                                   // 首页
+	r.GET("/my-content", handlers.MyContentPageHandler)                   // 我的内容页面
+	r.GET("/contents/edit/:contentID", handlers.EditContentPageHandler) // 编辑内容页面
+	r.GET("/contents/public", handlers.PublicContentPageHandler)        // 公开内容页面
+	r.GET("/search", handlers.SourceSearchPageHandler)                  // 搜索页面
 	r.GET("/:shortID", handlers.ShortLinkHandler)
+
+	// API路由 - 按资源分组
+	api := r.Group("/api")
+	{
+		// 内容相关API
+		contents := api.Group("/contents")
+		{
+			contents.GET("", handlers.MyContentAPIHandler)                         // 获取我的内容列表
+			contents.GET("/detail", handlers.ContentDetailHandler)                 // 获取内容详情
+			contents.POST("", handlers.ShareHandler)                               // 创建新内容
+			contents.PUT("", handlers.UpdateContentHandler)                        // 更新内容
+			contents.DELETE("", handlers.DeleteContentHandler)                     // 删除内容
+			contents.PATCH("/visibility", handlers.ToggleContentVisibilityHandler) // 切换可见性
+			contents.GET("/public", handlers.PublicContentAPIHandler)              // 获取公开内容
+			contents.GET("/search", handlers.SourceContentHandler)                 // 搜索内容
+		}
+
+		// 上传相关API
+		api.POST("/upload/image", handlers.UploadImageForMD) // Markdown编辑器的图片上传
+	}
 
 	// 确保上传目录存在
 	os.MkdirAll(utils.UploadsDir, 0755)

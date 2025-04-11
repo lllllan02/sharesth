@@ -322,7 +322,7 @@ function initSocialSharing() {
     document.getElementById('wechat-share').addEventListener('click', function() {
         const shortLink = document.getElementById('shortlink').textContent;
         showToast('请打开微信扫一扫，扫描链接二维码分享');
-        window.open(`https://w.url.cn/s/A${encodeURIComponent(shortLink)}`);
+        window.open(`https://w.url.cn/A${encodeURIComponent(shortLink)}`);
     });
     
     // QQ分享
