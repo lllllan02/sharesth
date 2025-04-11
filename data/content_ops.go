@@ -48,8 +48,12 @@ func FindContentsBySource(source string) []map[string]interface{} {
 	DB.Where("source = ?", source).Order("create_time DESC").Find(&contents)
 
 	var results []map[string]interface{}
+	// 初始化为空数组而非nil
+	results = make([]map[string]interface{}, 0)
+
 	for _, content := range contents {
-		results = append(results, map[string]interface{}{
+		// 创建基本结果
+		item := map[string]interface{}{
 			"id":         content.ID,
 			"short_id":   content.ShortID,
 			"type":       content.Type,
@@ -57,7 +61,24 @@ func FindContentsBySource(source string) []map[string]interface{} {
 			"link":       "/" + content.ShortID,
 			"title":      content.Title,
 			"is_public":  content.IsPublic,
-		})
+		}
+
+		// 根据内容类型添加不同的额外字段
+		if content.Type == "markdown" || content.Type == "text" {
+			// 为文本内容添加summary字段，截取部分内容作为摘要
+			if len(content.Data) > 200 {
+				item["summary"] = content.Data[:200] + "..."
+			} else {
+				item["summary"] = content.Data
+			}
+		} else if content.Type == "image" {
+			// 为图片内容添加相关URL
+			item["thumbnail_url"] = content.Data
+			item["image_url"] = content.Data
+			item["content_url"] = content.Data
+		}
+
+		results = append(results, item)
 	}
 
 	return results
@@ -69,15 +90,36 @@ func FindPublicContents() []map[string]interface{} {
 	DB.Where("is_public = ?", true).Order("create_time DESC").Find(&contents)
 
 	var results []map[string]interface{}
+	// 初始化为空数组而非nil
+	results = make([]map[string]interface{}, 0)
+
 	for _, content := range contents {
-		results = append(results, map[string]interface{}{
+		// 创建基本结果
+		item := map[string]interface{}{
 			"id":         content.ID,
 			"short_id":   content.ShortID,
 			"type":       content.Type,
 			"createTime": content.CreateTime,
 			"link":       "/" + content.ShortID,
 			"title":      content.Title,
-		})
+		}
+
+		// 根据内容类型添加不同的额外字段
+		if content.Type == "markdown" || content.Type == "text" {
+			// 为文本内容添加summary字段，截取部分内容作为摘要
+			if len(content.Data) > 200 {
+				item["summary"] = content.Data[:200] + "..."
+			} else {
+				item["summary"] = content.Data
+			}
+		} else if content.Type == "image" {
+			// 为图片内容添加相关URL
+			item["thumbnail_url"] = content.Data
+			item["image_url"] = content.Data
+			item["content_url"] = content.Data
+		}
+
+		results = append(results, item)
 	}
 
 	return results
@@ -125,8 +167,12 @@ func FindContentsBySourcePaginated(source string, query string, typeFilter strin
 
 	// 格式化结果
 	var results []map[string]interface{}
+	// 初始化为空数组而非nil
+	results = make([]map[string]interface{}, 0)
+
 	for _, content := range contents {
-		results = append(results, map[string]interface{}{
+		// 创建基本结果
+		item := map[string]interface{}{
 			"id":         content.ID,
 			"short_id":   content.ShortID,
 			"type":       content.Type,
@@ -134,7 +180,24 @@ func FindContentsBySourcePaginated(source string, query string, typeFilter strin
 			"link":       "/" + content.ShortID,
 			"title":      content.Title,
 			"is_public":  content.IsPublic,
-		})
+		}
+
+		// 根据内容类型添加不同的额外字段
+		if content.Type == "markdown" || content.Type == "text" {
+			// 为文本内容添加summary字段，截取部分内容作为摘要
+			if len(content.Data) > 200 {
+				item["summary"] = content.Data[:200] + "..."
+			} else {
+				item["summary"] = content.Data
+			}
+		} else if content.Type == "image" {
+			// 为图片内容添加相关URL
+			item["thumbnail_url"] = content.Data
+			item["image_url"] = content.Data
+			item["content_url"] = content.Data
+		}
+
+		results = append(results, item)
 	}
 
 	return total, results, typeCounts
@@ -160,15 +223,36 @@ func FindPublicContentsPaginated(query string, page int, perPage int) (int64, []
 
 	// 格式化结果
 	var results []map[string]interface{}
+	// 初始化为空数组而非nil
+	results = make([]map[string]interface{}, 0)
+
 	for _, content := range contents {
-		results = append(results, map[string]interface{}{
+		// 创建基本结果
+		item := map[string]interface{}{
 			"id":         content.ID,
 			"short_id":   content.ShortID,
 			"type":       content.Type,
 			"createTime": content.CreateTime,
 			"link":       "/" + content.ShortID,
 			"title":      content.Title,
-		})
+		}
+
+		// 根据内容类型添加不同的额外字段
+		if content.Type == "markdown" || content.Type == "text" {
+			// 为文本内容添加summary字段，截取部分内容作为摘要
+			if len(content.Data) > 200 {
+				item["summary"] = content.Data[:200] + "..."
+			} else {
+				item["summary"] = content.Data
+			}
+		} else if content.Type == "image" {
+			// 为图片内容添加相关URL
+			item["thumbnail_url"] = content.Data
+			item["image_url"] = content.Data
+			item["content_url"] = content.Data
+		}
+
+		results = append(results, item)
 	}
 
 	return total, results

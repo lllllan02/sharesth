@@ -122,3 +122,70 @@ func DeleteContentHandler(c *gin.Context) {
 		"message": "内容已成功删除",
 	})
 }
+
+// ContentDetailHandler 处理获取内容详情的请求
+func ContentDetailHandler(c *gin.Context) {
+	// 获取客户端标识
+	clientIdentifier := data.GetClientIdentifier(c.Request)
+
+	// 获取内容ID
+	contentID := c.Query("content_id")
+	if contentID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "未提供内容ID"})
+		return
+	}
+
+	// 判断是否需要包含完整内容
+	includeContent := c.Query("include_content") == "true"
+
+	// 加载内容
+	content, err := data.LoadContentBySource(contentID, clientIdentifier)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "找不到内容或您无权访问"})
+		return
+	}
+
+	// 构建返回结果
+	result := map[string]interface{}{
+		"id":         content.ID,
+		"short_id":   content.ShortID,
+		"type":       content.Type,
+		"createTime": content.CreateTime,
+		"title":      content.Title,
+		"is_public":  content.IsPublic,
+	}
+
+	// 根据内容类型和是否需要完整内容来添加字段
+	if includeContent {
+		result["content"] = content.Data
+
+		// 添加内容摘要
+		if content.Type == "markdown" || content.Type == "text" {
+			if len(content.Data) > 200 {
+				result["summary"] = content.Data[:200] + "..."
+			} else {
+				result["summary"] = content.Data
+			}
+		} else if content.Type == "image" {
+			result["thumbnail_url"] = content.Data
+			result["image_url"] = content.Data
+			result["content_url"] = content.Data
+		}
+	} else {
+		// 只返回摘要
+		if content.Type == "markdown" || content.Type == "text" {
+			if len(content.Data) > 200 {
+				result["summary"] = content.Data[:200] + "..."
+			} else {
+				result["summary"] = content.Data
+			}
+		} else if content.Type == "image" {
+			result["thumbnail_url"] = content.Data
+			result["image_url"] = content.Data
+			result["content_url"] = content.Data
+		}
+	}
+
+	// 返回结果
+	c.JSON(http.StatusOK, result)
+}

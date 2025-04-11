@@ -140,9 +140,9 @@ function displayContent(data) {
         document.getElementById('imageCount').textContent = data.typeCounts.image || 0;
     } else {
         // 如果后端未提供类型统计，暂时清空计数
-        document.getElementById('markdownCount').textContent = '-';
-        document.getElementById('textCount').textContent = '-';
-        document.getElementById('imageCount').textContent = '-';
+        document.getElementById('markdownCount').textContent = '0';
+        document.getElementById('textCount').textContent = '0';
+        document.getElementById('imageCount').textContent = '0';
     }
     
     // 显示或隐藏相关元素
@@ -158,7 +158,7 @@ function displayContent(data) {
         noContentEl.style.display = 'none';
         
         // 处理搜索结果
-        if ((searchTerm || typeFilter !== 'all') && data.items.length === 0) {
+        if ((searchTerm || typeFilter !== 'all') && (!data.items || data.items.length === 0)) {
             noSearchResultEl.style.display = 'block';
         } else {
             noSearchResultEl.style.display = 'none';
@@ -600,13 +600,21 @@ function loadContentPreview(button, contentId, summaryDiv) {
     button.disabled = true;
     button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 加载中...';
     
-    // 构建查询参数
+    // 如果摘要区域已经有内容（非默认内容），则直接显示 
+    const currentContent = summaryDiv.textContent;
+    if (currentContent && currentContent !== '内容加载中...' && currentContent !== '无内容预览') {
+        // 已经有摘要内容，直接显示
+        button.style.display = 'none';
+        return;
+    }
+    
+    // 构建查询参数 - 使用my-content接口
     const params = new URLSearchParams();
-    params.append('content_id', contentId);
-    params.append('include_content', 'true');
+    params.append('page', '1');
+    params.append('per_page', '50');
     
     // 发送请求获取内容
-    fetch(`/api/content-detail?${params.toString()}`, {
+    fetch(`/api/my-content?${params.toString()}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json'
@@ -614,27 +622,29 @@ function loadContentPreview(button, contentId, summaryDiv) {
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('获取内容预览失败');
+            throw new Error('获取内容列表失败');
         }
         return response.json();
     })
     .then(data => {
-        console.log('获取到内容详情:', data);
+        console.log('获取到内容列表:', data);
         
-        // 更新预览内容
-        let previewText = data.content || data.summary || '';
+        // 在items中查找对应ID的内容
+        const contentItem = data.items.find(item => item.short_id === contentId);
+        
+        if (!contentItem) {
+            throw new Error('未找到指定的内容');
+        }
+        
+        // 使用摘要字段
+        let previewText = contentItem.summary || '';
         
         if (!previewText) {
             throw new Error('未找到可预览内容');
         }
         
-        // 截取内容
-        if (previewText.length > 150) {
-            previewText = previewText.substring(0, 150) + '...';
-        }
-        
         // 如果是Markdown，简化处理
-        if (data.type === 'markdown') {
+        if (contentItem.type === 'markdown') {
             previewText = simplifyMarkdown(previewText);
         }
         
