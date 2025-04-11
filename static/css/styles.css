@@ -1926,4 +1926,37 @@ button:hover, .button:hover, .search-button:hover {
 .content-title.clickable a::after {
     content: "";
     margin-left: 0;
+}
+
+/* 用户信息卡片的样式 */
+.user-card {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.info-row {
+    margin: 8px 0;
+    padding: 2px 0;
+    color: #333;
+    font-size: 0.95em;
+    line-height: 1.5;
+}
+
+/* 来源ID使用蓝色突出显示 */
+.source-id-row {
+    color: #2175d9;
+    font-weight: 500;
+}
+
+/* 内容数量也使用蓝色突出显示 */
+.content-count-row {
+    color: #2175d9;
+    font-weight: 500;
+}
+
+#content-count {
+    font-weight: 600;
 } 

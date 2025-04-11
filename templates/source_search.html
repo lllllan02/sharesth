@@ -1,28 +1,26 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>查询用户分享记录</title>
+    <title>查询用户分享记录 - SharedSTH</title>
     
     <!-- 所有 CSS 和 JS 引用集中在这里 -->
     <!-- CSS 引用 -->
-    <!-- 先引入Bootstrap CSS -->
-    <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
-    <!-- 后引入自定义CSS，确保能覆盖Bootstrap样式 -->
     <link rel="stylesheet" href="/static/css/styles.css">
+    <!-- 引入 Toastify CSS -->
+    <link rel="stylesheet" href="/static/vendor/toastify/toastify.min.css">
     <!-- 引入Font Awesome图标库 -->
     <link rel="stylesheet" href="/static/vendor/fontawesome/all.min.css">
     
     <!-- JS 引用 -->
     <!-- 引入Headroom.js导航栏滚动效果库 -->
     <script src="/static/vendor/headroom/headroom.min.js"></script>
-    <!-- 引入jQuery库 -->
-    <script src="/static/vendor/jquery/jquery.min.js"></script>
-    <!-- 引入Toastify库 -->
-    <script src="/static/vendor/toastify/toastify.js"></script>
-    <!-- 引入公共JS -->
+    <!-- 引入 Toastify JS 库 -->
+    <script src="/static/vendor/toastify/toastify.min.js"></script>
+    <!-- 引入公共 JS -->
     <script src="/static/js/common.js"></script>
+    
     <!-- 引入页面专用JS -->
     <script src="/static/js/pages/source_search.js"></script>
 </head>
@@ -41,9 +39,10 @@
     
     <div class="container main-content">
         <h1>查询用户分享记录</h1>
+        
         <div class="search-form">
             <input type="text" id="sourceIdInput" placeholder="输入用户来源ID">
-            <button id="searchButton" class="search-button"><i class="fas fa-search"></i> 查询</button>
+            <button id="searchButton" class="button search-button"><i class="fas fa-search"></i> 查询</button>
         </div>
         
         <div id="loading" class="loading" style="display: none;">
@@ -60,14 +59,28 @@
                 <!-- 用户信息将通过JavaScript动态添加 -->
             </div>
             
-            <div id="titleSearch" class="search-box" style="display: none;">
-                <input type="text" id="titleSearchInput" class="search-input" placeholder="搜索标题关键词...">
-                <button id="titleSearchButton" class="search-button"><i class="fas fa-search"></i> 搜索</button>
+            <div class="filter-controls">
+                <div class="search-box">
+                    <input type="text" id="titleSearchInput" class="search-input" placeholder="搜索标题关键词...">
+                    <button id="titleSearchButton" class="button search-button"><i class="fas fa-search"></i> 搜索</button>
+                </div>
             </div>
             
-            <div id="contentList" class="content-list">
+            <ul id="contentList" class="content-list">
                 <!-- 内容项将通过JavaScript动态添加 -->
+            </ul>
+            
+            <!-- 分页控件容器 -->
+            <div id="pagination-container" class="pagination-container" style="display: none;"></div>
+            
+            <div id="noSearchResult" class="no-content" style="display: none;">
+                <p>没有找到匹配的内容</p>
+                <p>尝试其他关键词或清除搜索条件</p>
             </div>
+        </div>
+        
+        <div class="action-buttons">
+            <a href="/" class="button"><i class="fas fa-home"></i> 返回首页</a>
         </div>
     </div>
 </body>

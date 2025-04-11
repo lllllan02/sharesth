@@ -6,6 +6,7 @@ let pageSize = 10;
 let totalItems = 0;
 let currentType = 'all';
 let searchTerm = '';
+let typeStats = {};
 
 // 页面加载完成后执行
 document.addEventListener('DOMContentLoaded', function() {
@@ -42,14 +43,39 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// 通过类型筛选内容
+window.filterByType = function(type) {
+    if (type !== currentType) {
+        currentType = type;
+        currentPage = 1; // 重置到第一页
+        
+        // 更新类型筛选器的激活状态
+        updateTypeFilterActiveState();
+        
+        // 重新获取数据
+        fetchPublicContent(currentPage);
+    }
+};
+
+// 更新类型筛选器的激活状态
+function updateTypeFilterActiveState() {
+    // 移除所有类型筛选器的激活状态
+    document.querySelectorAll('.type-stat').forEach(el => {
+        el.classList.remove('active');
+    });
+    
+    // 为当前激活的类型添加激活状态
+    const activeFilter = document.querySelector(`.type-stat[data-type="${currentType}"]`);
+    if (activeFilter) {
+        activeFilter.classList.add('active');
+    }
+}
+
 // 获取公开内容
 function fetchPublicContent(page) {
     // 显示加载中
     document.getElementById('loading').style.display = 'block';
-    document.getElementById('content-list').style.display = 'none';
-    document.getElementById('pagination-container').style.display = 'none';
-    document.getElementById('no-content').style.display = 'none';
-    document.getElementById('no-search-result').style.display = 'none';
+    document.getElementById('contentContainer').style.display = 'none';
     
     // 构建查询参数
     const params = new URLSearchParams();
@@ -77,14 +103,22 @@ function fetchPublicContent(page) {
         .then(data => {
             // 隐藏加载中
             document.getElementById('loading').style.display = 'none';
+            document.getElementById('contentContainer').style.display = 'block';
             
             // 更新页面状态
             currentPage = data.page || 1;
             totalItems = data.total || 0;
             pageSize = data.per_page || 10;
+            typeStats = data.typeCounts || {};
+            
+            // 更新类型统计数量
+            updateTypeStats();
             
             // 处理内容渲染
             displayContent(data);
+            
+            // 更新类型筛选器的激活状态
+            updateTypeFilterActiveState();
         })
         .catch(error => {
             console.error('Error:', error);
@@ -95,9 +129,27 @@ function fetchPublicContent(page) {
         });
 }
 
+// 更新类型统计数量
+function updateTypeStats() {
+    document.getElementById('contentCount').textContent = totalItems;
+    document.getElementById('markdownCount').textContent = typeStats.markdown || 0;
+    document.getElementById('textCount').textContent = typeStats.text || 0;
+    document.getElementById('imageCount').textContent = typeStats.image || 0;
+}
+
+// 获取类型标签
+function getTypeLabel(type) {
+    switch (type) {
+        case 'text': return '文本';
+        case 'markdown': return 'Markdown';
+        case 'image': return '图片';
+        default: return type;
+    }
+}
+
 // 显示内容
 function displayContent(data) {
-    const contentList = document.getElementById('content-list');
+    const contentList = document.getElementById('contentList');
     const paginationContainer = document.getElementById('pagination-container');
     
     // 处理无内容情况
@@ -139,56 +191,145 @@ function displayContent(data) {
 
 // 创建内容项元素
 function createContentItem(item) {
-    const contentItem = document.createElement('div');
+    const contentItem = document.createElement('li');
     contentItem.className = 'content-item';
     
-    // 创建头部信息
-    const header = document.createElement('div');
-    header.className = 'content-header';
-    
-    // 内容类型标签
-    const typeSpan = document.createElement('span');
-    let typeClass = 'type-text';
-    let typeText = '文本内容';
-    let typeIcon = '<i class="fas fa-file-alt"></i>';
-    
-    if (item.type === 'markdown') {
-        typeClass = 'type-markdown';
-        typeText = 'Markdown';
-        typeIcon = '<i class="fab fa-markdown"></i>';
-    } else if (item.type === 'image') {
-        typeClass = 'type-image';
-        typeText = '图片内容';
-        typeIcon = '<i class="fas fa-image"></i>';
-    }
-    
-    typeSpan.className = `content-type ${typeClass}`;
-    typeSpan.innerHTML = `${typeIcon} ${typeText}`;
-    header.appendChild(typeSpan);
-    
-    // 内容标题
+    // 1. 创建标题链接 - 使用图一的样式
     const titleEl = document.createElement('h3');
     titleEl.className = 'content-title';
-    titleEl.textContent = item.title || '无标题';
     
-    // 添加内容链接
-    const contentLink = document.createElement('a');
-    contentLink.href = item.link;
-    contentLink.className = 'content-link';
-    contentLink.appendChild(titleEl);
+    const titleLink = document.createElement('a');
+    titleLink.href = item.link;
+    titleLink.target = "_blank";
+    titleLink.textContent = item.title || '无标题';
+    titleEl.appendChild(titleLink);
     
-    // 时间信息
-    const timeInfo = document.createElement('div');
-    timeInfo.className = 'time-info';
+    // 2. 创建内容预览
+    const previewContainer = document.createElement('div');
+    previewContainer.className = 'content-preview';
+    
+    // 根据内容类型显示不同的预览
+    if (item.type === 'image') {
+        // 图片内容显示缩略图
+        const thumbnailImg = document.createElement('img');
+        thumbnailImg.className = 'content-thumbnail';
+        
+        // 创建一个全局变量来记录已经尝试过的无效图片URL，避免重复请求
+        if (!window.invalidImageUrls) {
+            window.invalidImageUrls = new Set();
+        }
+        
+        // 首先检查当前图片URL是否已知无效
+        const imageUrl = item.thumbnail_url || item.image_url || item.content_url;
+        if (imageUrl && !window.invalidImageUrls.has(imageUrl)) {
+            thumbnailImg.src = imageUrl;
+        } else {
+            thumbnailImg.src = '/static/img/no-image.png';
+        }
+        
+        thumbnailImg.alt = item.title || '图片预览';
+        thumbnailImg.onerror = function() {
+            // 记录无效的URL，避免下次再次尝试加载
+            if (this.src !== '/static/img/no-image.png') {
+                window.invalidImageUrls.add(this.src);
+                this.src = '/static/img/no-image.png';
+                this.alt = '图片加载失败';
+            }
+        };
+        
+        const imgWrapper = document.createElement('div');
+        imgWrapper.className = 'image-preview-wrapper';
+        imgWrapper.appendChild(thumbnailImg);
+        
+        // 添加图片大小信息（如果有）
+        if (item.width && item.height) {
+            const sizeInfo = document.createElement('div');
+            sizeInfo.className = 'image-size-info';
+            sizeInfo.textContent = `${item.width} × ${item.height}`;
+            imgWrapper.appendChild(sizeInfo);
+        }
+        
+        previewContainer.appendChild(imgWrapper);
+    } else {
+        // 文本或Markdown内容显示摘要
+        const summaryDiv = document.createElement('div');
+        summaryDiv.className = 'content-summary';
+        
+        // 获取内容摘要
+        let previewText = item.summary || '';
+        
+        // 截取摘要，避免太长
+        if (previewText.length > 150) {
+            previewText = previewText.substring(0, 150) + '...';
+        }
+        
+        // 如果是Markdown内容且有内容，简化处理
+        if (item.type === 'markdown' && previewText) {
+            previewText = simplifyMarkdown(previewText);
+        }
+        
+        // 设置纯文本内容，更安全
+        summaryDiv.textContent = previewText;
+        
+        previewContainer.appendChild(summaryDiv);
+    }
+    
+    // 3. 创建操作区域 - 使用图一的样式
+    const metaDiv = document.createElement('div');
+    metaDiv.className = 'content-meta';
+    
+    // 添加内容类型图标
+    const typeIcon = document.createElement('span');
+    typeIcon.className = 'meta-item type-icon';
+    
+    if (item.type === 'markdown') {
+        typeIcon.innerHTML = '<i class="fab fa-markdown"></i>';
+        typeIcon.title = 'Markdown 内容';
+    } else if (item.type === 'image') {
+        typeIcon.innerHTML = '<i class="fas fa-image"></i>';
+        typeIcon.title = '图片内容';
+    } else {
+        typeIcon.innerHTML = '<i class="fas fa-file-alt"></i>';
+        typeIcon.title = '文本内容';
+    }
+    
+    metaDiv.appendChild(typeIcon);
+    
+    // 添加时间
+    const timeSpan = document.createElement('span');
+    timeSpan.className = 'meta-item time';
+    
     const createDate = new Date(item.createTime);
-    timeInfo.innerHTML = `<i class="far fa-clock"></i> ${createDate.toLocaleString('zh-CN')}`;
+    const formattedDate = createDate.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
     
-    // 将元素添加到内容项
-    contentItem.appendChild(header);
-    contentItem.appendChild(contentLink);
-    contentItem.appendChild(timeInfo);
+    timeSpan.innerHTML = `<i class="far fa-clock"></i> ${formattedDate}`;
+    metaDiv.appendChild(timeSpan);
+    
+    // 将所有元素添加到内容项
+    contentItem.appendChild(titleEl);
+    contentItem.appendChild(previewContainer);
+    contentItem.appendChild(metaDiv);
     
     return contentItem;
+}
+
+// 简化Markdown文本
+function simplifyMarkdown(text) {
+    return text
+        .replace(/\*\*(.*?)\*\*/g, '$1') // 移除粗体标记
+        .replace(/\*(.*?)\*/g, '$1')     // 移除斜体标记
+        .replace(/\[(.*?)\]\(.*?\)/g, '$1') // 移除链接，保留链接文本
+        .replace(/\n/g, ' ')            // 将换行符替换为空格
+        .replace(/#{1,6}\s/g, '')       // 移除标题标记
+        .replace(/`{1,3}(.*?)`{1,3}/g, '$1') // 移除代码标记
+        .replace(/>\s(.*?)(?=\n|$)/g, '$1') // 移除引用标记
+        .trim();
 }
 
 // 更新分页

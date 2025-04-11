@@ -34,14 +34,18 @@ func PublicContentAPIHandler(c *gin.Context) {
 	// 获取搜索参数
 	query := c.Query("query")
 
-	// 获取总记录数和分页数据
-	total, results := data.FindPublicContentsPaginated(query, page, perPage)
+	// 获取类型筛选参数
+	typeFilter := c.Query("type")
+
+	// 获取总记录数、分页数据和类型统计
+	total, results, typeCounts := data.FindPublicContentsPaginated(query, typeFilter, page, perPage)
 
 	// 返回JSON结果
 	c.JSON(http.StatusOK, gin.H{
-		"total":    total,
-		"page":     page,
-		"per_page": perPage,
-		"items":    results,
+		"total":      total,
+		"page":       page,
+		"per_page":   perPage,
+		"items":      results,
+		"typeCounts": typeCounts,
 	})
 }

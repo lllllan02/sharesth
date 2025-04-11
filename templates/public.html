@@ -1,16 +1,17 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>公开分享内容</title>
+    <title>公开分享内容 - SharedSTH</title>
     
     <!-- 所有 CSS 和 JS 引用集中在这里 -->
     <!-- CSS 引用 -->
     <!-- 先引入Bootstrap CSS -->
     <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
-    <!-- 后引入自定义CSS，确保能覆盖Bootstrap样式 -->
     <link rel="stylesheet" href="/static/css/styles.css">
+    <!-- 引入 Toastify CSS -->
+    <link rel="stylesheet" href="/static/vendor/toastify/toastify.min.css">
     <!-- 引入Font Awesome图标库 -->
     <link rel="stylesheet" href="/static/vendor/fontawesome/all.min.css">
     
@@ -19,10 +20,11 @@
     <script src="/static/vendor/headroom/headroom.min.js"></script>
     <!-- 引入jQuery库 -->
     <script src="/static/vendor/jquery/jquery.min.js"></script>
-    <!-- 引入Toastify库 -->
-    <script src="/static/vendor/toastify/toastify.js"></script>
-    <!-- 引入公共JS -->
+    <!-- 引入 Toastify JS 库 -->
+    <script src="/static/vendor/toastify/toastify.min.js"></script>
+    <!-- 引入公共 JS -->
     <script src="/static/js/common.js"></script>
+    
     <!-- 引入页面专用JS -->
     <script src="/static/js/pages/public.js"></script>
 </head>
@@ -42,40 +44,53 @@
     <div class="container main-content">
         <h1>公开分享内容</h1>
         
-        <div class="filter-controls">
-            <div class="type-filter">
-                <label for="type-filter">内容类型:</label>
-                <select id="type-filter">
-                    <option value="all">全部</option>
-                    <option value="text">文本</option>
-                    <option value="markdown">Markdown</option>
-                    <option value="image">图片</option>
-                </select>
-            </div>
-            
-            <div class="search-box">
-                <input type="text" id="searchInput" class="search-input" placeholder="搜索标题关键词...">
-                <button id="searchButton" class="search-button"><i class="fas fa-search"></i> 搜索</button>
-            </div>
-        </div>
-        
         <div id="loading" class="loading">
             <div class="spinner"></div>
             <p>正在加载数据...</p>
         </div>
         
-        <div id="content-list" class="content-list" style="display: none;"></div>
-        
-        <!-- 分页控件容器 -->
-        <div id="pagination-container" class="pagination-container" style="display: none;"></div>
-        
-        <div id="no-content" class="no-content" style="display: none;">
-            <p>暂无公开分享内容</p>
+        <div id="contentContainer" style="display: none;">
+            <div class="content-stats-row">
+                <span class="type-stat all" title="显示全部内容" data-type="all" onclick="filterByType('all')">
+                    <i class="fas fa-layer-group"></i> 全部 <span id="contentCount">0</span>
+                </span>
+                <span class="type-stat markdown" title="点击筛选Markdown内容" data-type="markdown" onclick="filterByType('markdown')">
+                    <i class="fab fa-markdown"></i> <span id="markdownCount">0</span>
+                </span>
+                <span class="type-stat text" title="点击筛选文本内容" data-type="text" onclick="filterByType('text')">
+                    <i class="fas fa-file-alt"></i> <span id="textCount">0</span>
+                </span>
+                <span class="type-stat image" title="点击筛选图片内容" data-type="image" onclick="filterByType('image')">
+                    <i class="fas fa-image"></i> <span id="imageCount">0</span>
+                </span>
+            </div>
+            
+            <div class="filter-controls">
+                <div class="search-box">
+                    <input type="text" id="searchInput" class="search-input" placeholder="搜索标题关键词...">
+                    <button id="searchButton" class="search-button"><i class="fas fa-search"></i> 搜索</button>
+                </div>
+            </div>
+            
+            <ul id="contentList" class="content-list">
+                <!-- 内容项将通过JavaScript动态添加 -->
+            </ul>
+            
+            <!-- 分页控件容器 -->
+            <div id="pagination-container" class="pagination-container"></div>
+            
+            <div id="no-content" class="no-content" style="display: none;">
+                <p>暂无公开分享内容</p>
+            </div>
+            
+            <div id="no-search-result" class="no-content" style="display: none;">
+                <p>没有找到匹配的内容</p>
+                <p>尝试其他关键词或清除搜索条件</p>
+            </div>
         </div>
         
-        <div id="no-search-result" class="no-content" style="display: none;">
-            <p>没有找到匹配的内容</p>
-            <p>尝试其他关键词或清除搜索条件</p>
+        <div class="action-buttons">
+            <a href="/" class="button"><i class="fas fa-home"></i> 返回首页</a>
         </div>
     </div>
 </body>
