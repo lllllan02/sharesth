@@ -726,9 +726,6 @@ window.copySourceId = function() {
 
 // 编辑内容
 function editContent(element, contentId, contentType) {
-    // 创建编辑页面URL - 使用新路径
-    const editUrl = `/contents/edit/${contentId}`;
-    
-    // 跳转到编辑页面
-    window.location.href = editUrl;
+    // 显示提示消息
+    showToast('编辑功能已禁用，暂不支持内容编辑', TOAST_TYPE.WARNING);
 } 

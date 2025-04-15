@@ -53,11 +53,7 @@
         <div class="content-meta-info">
             <span class="meta-item"><i class="fas fa-clock"></i> 创建时间: {{.createTime.Format "2006-01-02 15:04:05"}}</span>
             <span class="meta-item">
-                {{if .isOwner}}
-                <a href="/contents/edit/{{.shortID}}" class="edit-link" title="编辑内容"><i class="fas fa-edit"></i> 最后修改: {{.updateTime.Format "2006-01-02 15:04:05"}}</a>
-                {{else}}
                 <i class="fas fa-edit"></i> 最后修改: {{.updateTime.Format "2006-01-02 15:04:05"}}
-                {{end}}
             </span>
         </div>
         
