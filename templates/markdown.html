@@ -70,7 +70,7 @@
                 <i class="fas fa-clock"></i> 创建时间: {{.createTime.Format "2006-01-02 15:04:05"}}
             </span>
             {{if .isOwner}}
-            <a href="/contents/edit/{{.shortID}}" class="meta-item time-item" title="点击编辑内容">
+            <a href="/edit/{{.shortID}}" class="meta-item time-item" title="点击编辑内容">
                 <i class="fas fa-edit"></i> 最后修改: {{.updateTime.Format "2006-01-02 15:04:05"}}
             </a>
             {{else}}

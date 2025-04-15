@@ -37,12 +37,11 @@ func main() {
 	r.LoadHTMLGlob("templates/*.html")
 
 	// 前端页面路由
-	r.GET("/", handlers.IndexHandler)                                   // 首页
-	r.GET("/my-content", handlers.MyContentPageHandler)                 // 我的内容页面
-	r.GET("/contents/public", handlers.PublicContentPageHandler)        // 公开内容页面
-	r.GET("/public", handlers.PublicContentPageHandler)                 // 公开内容页面(简短路径)
-	r.GET("/search", handlers.SourceSearchPageHandler)                  // 搜索页面
-	r.GET("/contents/edit/:shortID", handlers.EditContentByPathHandler) // 编辑页面
+	r.GET("/", handlers.IndexHandler)                          // 首页
+	r.GET("/my-content", handlers.MyContentPageHandler)        // 我的内容页面
+	r.GET("/public", handlers.PublicContentPageHandler)        // 公开内容页面
+	r.GET("/search", handlers.SourceSearchPageHandler)         // 搜索页面
+	r.GET("/edit/:shortID", handlers.EditContentByPathHandler) // 编辑页面
 	r.GET("/:shortID", handlers.ShortLinkHandler)
 
 	// API路由 - 按资源分组
