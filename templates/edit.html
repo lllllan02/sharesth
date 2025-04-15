@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑内容 - ShareSTH</title>
+    
+    <!-- 所有 CSS 和 JS 引用集中在这里 -->
+    <!-- CSS 引用 -->
+    {{if eq .type "markdown"}}
+    <!-- 引入 Markdown 编辑器样式 (优先加载) -->
+    <link rel="stylesheet" href="/static/vendor/markdown-editor/easymde.min.css">
+    {{end}}
+    <!-- 引入自定义CSS -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <!-- 引入Toastify CSS -->
+    <link rel="stylesheet" href="/static/vendor/toastify/toastify.min.css">
+    <!-- 引入Font Awesome图标库 -->
+    <link rel="stylesheet" href="/static/vendor/fontawesome/all.min.css">
+    
+    <!-- JS 引用 -->
+    <!-- 引入Headroom.js导航栏滚动效果库 -->
+    <script src="/static/vendor/headroom/headroom.min.js"></script>
+    {{if eq .type "markdown"}}
+    <!-- 引入 Markdown 编辑器 -->
+    <script src="/static/vendor/markdown-editor/easymde.min.js"></script>
+    <!-- 引入 Markdown 渲染库 -->
+    <script src="/static/vendor/marked/marked.min.js"></script>
+    {{end}}
+    <!-- 引入Toastify JS库 -->
+    <script src="/static/vendor/toastify/toastify.min.js"></script>
+    <!-- 引入公共JS -->
+    <script src="/static/js/common.js"></script>
+    
+    <!-- 传递内容数据 -->
+    <script>
+        // 初始化变量 - 将在页面加载后从body的data属性读取
+        var contentData, contentType, contentId, contentTitle, isPublic;
+        
+        // 作为备份的保存函数，确保在static/js/pages/edit.js加载失败时也能使用
+        function backupSaveContent() {
+            // 创建表单数据
+            const formData = new FormData(document.getElementById('editForm'));
+            
+            // 禁用按钮
+            const saveBtn = document.getElementById('saveButton');
+            if (saveBtn) {
+                const originalText = saveBtn.innerHTML;
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 保存中...';
+                
+                // 发送请求
+                fetch('/api/contents/update', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message || '内容已成功更新', TOAST_TYPE.SUCCESS);
+                        
+                        // 立即返回上一页，不再延迟
+                        history.back();
+                    } else {
+                        throw new Error(data.error || '更新失败');
+                    }
+                    
+                    // 恢复按钮
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = originalText;
+                })
+                .catch(error => {
+                    showToast(error.message || '保存失败', TOAST_TYPE.ERROR);
+                    
+                    // 恢复按钮
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = originalText;
+                });
+            }
+        }
+        
+        // 全局的保存内容函数，将在edit.js加载后被覆盖
+        window.saveContent = backupSaveContent;
+    </script>
+    
+    <!-- 引入页面专用JS -->
+    <script src="/static/js/pages/edit.js"></script>
+</head>
+<body data-content="{{.content}}" data-type="{{.type}}" data-id="{{.short_id}}" data-title="{{.title}}" data-public="{{if .is_public}}true{{else}}false{{end}}">
+    <!-- 页头导航 -->
+    <div class="header-wrapper">
+        <div class="header-content">
+            <div class="header-nav">
+                <a href="/"><i class="fas fa-home"></i> 首页</a>
+                <a href="/my-content"><i class="fas fa-list"></i> 我的分享</a>
+                <a href="/search"><i class="fas fa-search"></i> 查询用户分享</a>
+                <a href="/public"><i class="fas fa-globe"></i> 浏览公开内容</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container main-content">
+        <h1><i class="fas fa-edit"></i> 编辑内容</h1>
+        
+        <div class="content-tag-container">
+            <div class="content-type-tag 
+                {{if eq .type "markdown"}}markdown-tag
+                {{else if eq .type "text"}}text-tag
+                {{else if eq .type "image"}}image-tag{{end}}">
+                {{if eq .type "markdown"}}
+                <i class="fab fa-markdown"></i> Markdown
+                {{else if eq .type "text"}}
+                <i class="fas fa-file-alt"></i> 纯文本
+                {{else if eq .type "image"}}
+                <i class="fas fa-image"></i> 图片
+                {{end}}
+            </div>
+        </div>
+        
+        <div class="edit-form">
+            <form id="editForm">
+                <input type="hidden" id="contentId" name="content_id" value="{{.short_id}}">
+                <input type="hidden" id="contentType" name="type" value="{{.type}}">
+                
+                <div class="form-group">
+                    <label for="title"><i class="fas fa-heading"></i> 标题</label>
+                    <input type="text" id="title" name="title" class="form-control title-input" value="{{.title}}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="isPublic"><i class="fas fa-globe"></i> 公开设置</label>
+                    <div class="privacy-setting">
+                        <label class="privacy-label">
+                            <input type="checkbox" id="isPublic" name="is_public" {{if .is_public}}checked{{end}}> 
+                            <span id="visibilityStatus">公开此内容 <i class="fas fa-question-circle tooltip-icon" data-tooltip="公开内容将显示在公共页面上，任何人都可以浏览"></i></span>
+                        </label>
+                    </div>
+                </div>
+                
+                {{if eq .type "markdown"}}
+                <div class="form-group">
+                    <label for="content" class="input-label"><i class="fas fa-file-alt"></i> Markdown 内容</label>
+                    <div class="editor-container">
+                        <textarea id="content" name="content" data-markdown-editor="true" required>{{.content_raw}}</textarea>
+                    </div>
+                    
+                    <div class="preview-toggle" id="toggle-preview"><i class="fas fa-eye"></i> 显示预览</div>
+                    <div class="preview-container hidden" id="preview-container"></div>
+                </div>
+                {{else if eq .type "text"}}
+                <div class="form-group">
+                    <label for="content" class="input-label"><i class="fas fa-file-alt"></i> 文本内容</label>
+                    <textarea id="content" name="content" class="form-control" required>{{.content_raw}}</textarea>
+                </div>
+                {{else}}
+                <div class="form-group">
+                    <label class="input-label"><i class="fas fa-image"></i> 图片内容</label>
+                    <div class="image-preview">
+                        <img src="{{.content_raw}}" alt="{{.title}}" class="preview-image">
+                        <p class="image-info"><i class="fas fa-info-circle"></i> 图片无法直接编辑。如需更改图片，请删除此内容并重新上传。</p>
+                    </div>
+                </div>
+                {{end}}
+                
+                <div class="button-group">
+                    <button type="button" class="button" onclick="window.location.href='/my-content'"><i class="fas fa-times"></i> 取消</button>
+                    <button type="button" class="button" id="saveButton" onclick="saveContent()"><i class="fas fa-save"></i> 保存更改</button>
+                </div>
+            </form>
+        </div>
+
+        {{if eq .type "markdown"}}
+        <div class="tips">
+            <h3><i class="fas fa-lightbulb"></i> Markdown 编辑小技巧</h3>
+            <ul>
+                <li><i class="fas fa-heading"></i> 使用 # 创建标题 (# 一级标题, ## 二级标题)</li>
+                <li><i class="fas fa-bold"></i> 使用 **文本** 或 __文本__ 来加粗文本</li>
+                <li><i class="fas fa-italic"></i> 使用 *文本* 或 _文本_ 来斜体显示</li>
+                <li><i class="fas fa-list-ul"></i> 使用 - 或 * 创建无序列表</li>
+                <li><i class="fas fa-list-ol"></i> 使用 1. 2. 3. 创建有序列表</li>
+                <li><i class="fas fa-link"></i> 插入链接: [链接文本](URL)</li>
+                <li><i class="fas fa-image"></i> 插入图片: ![替代文本](图片URL)</li>
+                <li><i class="fas fa-table"></i> 创建表格: | 表头 | 表头 | 然后下一行 | --- | --- |</li>
+            </ul>
+        </div>
+        {{end}}
+    </div>
+</body>
+</html> 

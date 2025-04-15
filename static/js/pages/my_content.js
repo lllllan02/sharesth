@@ -337,7 +337,7 @@ function renderContent(items) {
         
         // 创建标题链接
         const titleLink = document.createElement('a');
-        titleLink.href = item.link;
+        titleLink.href = "/" + item.short_id;
         titleLink.target = "_blank";
         titleLink.textContent = item.title || '无标题';
         title.appendChild(titleLink);
@@ -726,6 +726,6 @@ window.copySourceId = function() {
 
 // 编辑内容
 function editContent(element, contentId, contentType) {
-    // 显示提示消息
-    showToast('编辑功能已禁用，暂不支持内容编辑', TOAST_TYPE.WARNING);
+    // 跳转到编辑页面，确保使用正确的URL格式
+    window.location.href = `/content/edit?content_id=${contentId}`;
 } 

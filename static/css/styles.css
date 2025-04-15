@@ -434,39 +434,28 @@ button:hover, .button:hover, .search-button:hover {
 .content-title-wrapper {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 10px;
-    flex-wrap: wrap;
+    margin-bottom: 20px;
 }
 
 .content-title {
     margin: 0;
-    padding: 0;
-    font-size: 1.8em;
-    color: #1976D2;
-    font-weight: 600;
+    margin-right: 10px;
+    color: #333;
 }
 
-/* 类型标签样式 - 简洁版，只有图标 */
 .content-type-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
-    font-size: 0.8em;
-    background-color: #f5f5f5;
-    color: #555;
-    border: 1px solid #e0e0e0;
-    position: relative;
-    top: -3px;
-    margin-left: 5px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    background-color: #f0f0f0;
+    color: #666;
 }
 
 .content-type-badge i {
-    font-size: 0.9em;
+    font-size: 16px;
 }
 
 .content-tag-container {
@@ -1963,25 +1952,83 @@ button:hover, .button:hover, .search-button:hover {
 
 /* 内容元数据信息样式 */
 .content-meta-info {
-    margin-top: 10px;
-    margin-bottom: 15px;
+    margin-top: 20px;
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
-    color: #607D8B;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 15px;
+    color: #666;
     font-size: 14px;
-    text-align: right;
+    padding: 10px 0;
+    border-top: 1px solid #eee;
 }
 
-.meta-item {
+.content-meta-info .meta-item {
     display: flex;
     align-items: center;
     gap: 5px;
 }
 
-.meta-item i {
-    color: #42A5F5;
+.content-meta-info .meta-item i {
+    color: #2196F3;
+}
+
+/* 内容页面编辑链接样式 */
+.content-meta-info .edit-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background-color: #e1f5fe;
+    color: #0288d1;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid #b3e5fc;
+    margin-left: auto;
+}
+
+.content-meta-info .edit-link:hover {
+    background-color: #b3e5fc;
+    color: #01579b;
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.content-meta-info .edit-link i {
+    color: #0288d1;
+}
+
+/* 时间链接样式 */
+.content-meta-info .time-item {
+    color: #0288d1;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.content-meta-info .time-item:hover {
+    color: #01579b;
+    background-color: #f0f9ff;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.content-meta-info .time-item::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: #b3e5fc;
+    transition: background-color 0.2s;
+}
+
+.content-meta-info .time-item:hover::after {
+    background-color: #0288d1;
+    height: 2px;
 }
 
 /* 编辑链接样式 */
@@ -2009,4 +2056,172 @@ button:hover, .button:hover, .search-button:hover {
 
 .edit-button:hover {
     background-color: #388E3C;
+}
+
+/* 编辑表单样式 */
+.edit-form {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 24px;
+    margin-bottom: 30px;
+}
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+}
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+.form-control:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+}
+textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+}
+.toggle-switch {
+    display: flex;
+    align-items: center;
+}
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.slider {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+    background-color: #ccc;
+    border-radius: 24px;
+    margin-right: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+input:checked + .slider {
+    background-color: var(--success-color);
+}
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+#visibilityStatus {
+    font-weight: 500;
+}
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 24px;
+}
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 16px;
+    transition: all 0.2s;
+}
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+.btn-primary:hover {
+    background-color: var(--primary-dark-color);
+}
+.btn-secondary {
+    background-color: #f0f0f0;
+    color: #333;
+}
+.btn-secondary:hover {
+    background-color: #e0e0e0;
+}
+.image-preview {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    text-align: center;
+}
+.preview-image {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+.image-info {
+    color: #666;
+    font-style: italic;
+}
+
+/* 内容类型图标颜色 */
+.content-type-badge i.fa-markdown {
+    color: #6c5ce7;
+}
+.content-type-badge i.fa-file-alt {
+    color: #00b894;
+}
+.content-type-badge i.fa-image {
+    color: #e84393;
+}
+
+/* EasyMDE编辑器样式覆盖 */
+.CodeMirror {
+    border: 1px solid #ddd !important;
+    border-radius: 4px;
+}
+.editor-toolbar {
+    border: 1px solid #ddd;
+    border-radius: 4px 4px 0 0;
+    border-bottom: none;
+    background-color: #f8f8f8;
+}
+
+/* 编辑页面特定样式 */
+.edit-form .content-title-wrapper {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.edit-form .content-title {
+    margin: 0;
+    margin-right: 10px;
+    color: #333;
+}
+.edit-form .content-type-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    color: #666;
+}
+.edit-form .content-type-badge i {
+    font-size: 16px;
 } 

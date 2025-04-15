@@ -37,10 +37,12 @@ func main() {
 	r.LoadHTMLGlob("templates/*.html")
 
 	// 前端页面路由
-	r.GET("/", handlers.IndexHandler)                            // 首页
-	r.GET("/my-content", handlers.MyContentPageHandler)          // 我的内容页面
-	r.GET("/contents/public", handlers.PublicContentPageHandler) // 公开内容页面
-	r.GET("/search", handlers.SourceSearchPageHandler)           // 搜索页面
+	r.GET("/", handlers.IndexHandler)                                   // 首页
+	r.GET("/my-content", handlers.MyContentPageHandler)                 // 我的内容页面
+	r.GET("/contents/public", handlers.PublicContentPageHandler)        // 公开内容页面
+	r.GET("/search", handlers.SourceSearchPageHandler)                  // 搜索页面
+	r.GET("/content/edit", handlers.EditContentPageHandler)             // 编辑页面(新路径)
+	r.GET("/contents/edit/:shortID", handlers.EditContentByPathHandler) // 编辑页面(旧路径兼容)
 	r.GET("/:shortID", handlers.ShortLinkHandler)
 
 	// API路由 - 按资源分组
@@ -52,6 +54,7 @@ func main() {
 			contents.GET("", handlers.MyContentAPIHandler)                         // 获取我的内容列表
 			contents.GET("/detail", handlers.ContentDetailHandler)                 // 获取内容详情
 			contents.POST("", handlers.ShareHandler)                               // 创建新内容
+			contents.POST("/update", handlers.UpdateContentHandler)                // 更新内容
 			contents.DELETE("", handlers.DeleteContentHandler)                     // 删除内容
 			contents.PATCH("/visibility", handlers.ToggleContentVisibilityHandler) // 切换可见性
 			contents.GET("/public", handlers.PublicContentAPIHandler)              // 获取公开内容
