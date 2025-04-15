@@ -42,8 +42,7 @@ func main() {
 	r.GET("/contents/public", handlers.PublicContentPageHandler)        // 公开内容页面
 	r.GET("/public", handlers.PublicContentPageHandler)                 // 公开内容页面(简短路径)
 	r.GET("/search", handlers.SourceSearchPageHandler)                  // 搜索页面
-	r.GET("/content/edit", handlers.EditContentPageHandler)             // 编辑页面(新路径)
-	r.GET("/contents/edit/:shortID", handlers.EditContentByPathHandler) // 编辑页面(旧路径兼容)
+	r.GET("/contents/edit/:shortID", handlers.EditContentByPathHandler) // 编辑页面
 	r.GET("/:shortID", handlers.ShortLinkHandler)
 
 	// API路由 - 按资源分组

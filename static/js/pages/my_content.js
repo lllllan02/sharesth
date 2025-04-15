@@ -726,6 +726,6 @@ window.copySourceId = function() {
 
 // 编辑内容
 function editContent(element, contentId, contentType) {
-    // 跳转到编辑页面，确保使用正确的URL格式
-    window.location.href = `/content/edit?content_id=${contentId}`;
+    // 跳转到编辑页面，使用统一的URL格式
+    window.location.href = `/contents/edit/${contentId}`;
 } 
